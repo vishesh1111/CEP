@@ -85,7 +85,7 @@ export function EventCard({ event, userRegistration, index = 0 }: EventCardProps
           <div className="flex items-center gap-2">
             <Users className="w-4 h-4 shrink-0" />
             <span className={cn("font-medium", seatsColor)}>
-              {event.seats_remaining} / {event.total_seats} seats left
+              {event.seats_remaining === 0 ? 'Event Full' : `${event.total_seats - event.seats_remaining} / ${event.total_seats} registered`}
             </span>
           </div>
           <div className="mt-2">

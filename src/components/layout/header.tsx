@@ -99,6 +99,7 @@ export function Header() {
               <Link
                 key={link.label}
                 href={link.href}
+                prefetch={true}
                 className={cn(
                   'text-[15px] font-medium transition-all relative py-1',
                   pathname === link.href ? 'text-blue-700 dark:text-blue-500' : 'text-muted-foreground hover:text-foreground'

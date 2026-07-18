@@ -159,7 +159,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
                   <div className="flex-1">
                     <div className="font-medium">Availability</div>
                     <div className="text-sm text-muted-foreground flex items-center gap-2 mb-2">
-                      <span>{event.seats_remaining} of {event.total_seats} seats</span>
+                      <span>{event.seats_remaining === 0 ? 'Event Full' : `${event.total_seats - event.seats_remaining} / ${event.total_seats} registered`}</span>
                       {fillPercentage > 80 && event.seats_remaining > 0 && (
                         <Badge variant="destructive" className="h-5 text-[10px] uppercase">Filling Fast</Badge>
                       )}
