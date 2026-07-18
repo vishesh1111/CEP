@@ -143,7 +143,7 @@ export function LandingHero() {
             {[
               { icon: CalendarDays, value: 150, suffix: '+', label: 'Total Events', color: 'from-indigo-500 to-violet-600' },
               { icon: Users, value: 5000, suffix: '+', label: 'Active Students', color: 'from-violet-500 to-purple-600' },
-              { icon: Sparkles, value: 7, suffix: '', label: 'Categories', color: 'from-purple-500 to-pink-600' },
+              { icon: Sparkles, value: 9, suffix: '', label: 'Categories', color: 'from-purple-500 to-pink-600' },
             ].map((item, i) => (
               <motion.div
                 key={item.label}

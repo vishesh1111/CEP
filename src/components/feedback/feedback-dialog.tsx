@@ -70,8 +70,13 @@ export function FeedbackDialog({ eventId, eventTitle, trigger }: FeedbackDialogP
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3 w-full">
-        {trigger || (
+      <DialogTrigger 
+        nativeButton={false}
+        render={
+          trigger ? (trigger as React.ReactElement) : <Button variant="outline" className="w-full" />
+        }
+      >
+        {!trigger && (
           <>
             <MessageSquare className="w-4 h-4 mr-2" />
             <span>{existingFeedback ? 'Edit Feedback' : 'Leave Feedback'}</span>

@@ -30,6 +30,8 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
+import { isRedirectError } from 'next/dist/client/components/redirect';
+
 export default function LoginPage() {
   const [isPending, setIsPending] = React.useState(false);
 
@@ -47,12 +49,15 @@ export default function LoginPage() {
       const result = await signIn(data);
       if (result?.error) {
         toast.error(result.error);
+        setIsPending(false);
       } else {
         toast.success('Logged in successfully!');
       }
     } catch (error) {
+      if (isRedirectError(error)) {
+        throw error;
+      }
       toast.error('An unexpected error occurred');
-    } finally {
       setIsPending(false);
     }
   }

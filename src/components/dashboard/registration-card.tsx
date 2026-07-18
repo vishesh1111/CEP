@@ -245,10 +245,10 @@ export function RegistrationCard({ registration, isPast }: RegistrationCardProps
                   eventId={event.id}
                   eventTitle={event.title}
                   trigger={
-                    <div className="w-full">
-                      <MessageSquare className="w-4 h-4 mr-2 inline-block" />
+                    <Button variant="outline" size="sm" className="w-full">
+                      <MessageSquare className="w-4 h-4 mr-2" />
                       <span>Feedback</span>
-                    </div>
+                    </Button>
                   }
                 />
               </div>
