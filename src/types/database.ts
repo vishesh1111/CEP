@@ -59,6 +59,24 @@ export type AnnouncementWithEvent = Announcement & {
   events: Event | null;
 };
 
+export type Feedback = {
+  id: string;
+  event_id: string;
+  user_id: string;
+  rating: number;
+  comment: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type Waitlist = {
+  id: string;
+  user_id: string;
+  event_id: string;
+  joined_at: string;
+  notified: boolean;
+};
+
 // Database schema type for Supabase client
 // Must satisfy GenericSchema: { Tables, Views, Functions }
 // Uses `type` aliases (not `interface`) for Row/Insert/Update so they have
@@ -134,6 +152,56 @@ export type Database = {
           {
             foreignKeyName: 'announcements_posted_by_fkey';
             columns: ['posted_by'];
+            isOneToOne: false;
+            referencedRelation: 'users';
+            referencedColumns: ['id'];
+          }
+        ];
+      };
+      feedback: {
+        Row: Feedback;
+        Insert: Omit<Feedback, 'id' | 'created_at' | 'updated_at'> & {
+          id?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Omit<Feedback, 'id'>>;
+        Relationships: [
+          {
+            foreignKeyName: 'feedback_event_id_fkey';
+            columns: ['event_id'];
+            isOneToOne: false;
+            referencedRelation: 'events';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'feedback_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'users';
+            referencedColumns: ['id'];
+          }
+        ];
+      };
+      waitlist: {
+        Row: Waitlist;
+        Insert: Omit<Waitlist, 'id' | 'joined_at' | 'notified'> & {
+          id?: string;
+          joined_at?: string;
+          notified?: boolean;
+        };
+        Update: Partial<Omit<Waitlist, 'id'>>;
+        Relationships: [
+          {
+            foreignKeyName: 'waitlist_event_id_fkey';
+            columns: ['event_id'];
+            isOneToOne: false;
+            referencedRelation: 'events';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'waitlist_user_id_fkey';
+            columns: ['user_id'];
             isOneToOne: false;
             referencedRelation: 'users';
             referencedColumns: ['id'];

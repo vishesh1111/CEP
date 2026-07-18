@@ -2,18 +2,21 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft, Calendar, Clock, MapPin, Users, AlertCircle, Info } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, MapPin, Users, AlertCircle, Info, Star } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { RegisterButton } from '@/components/events/register-button';
 import { AddToCalendarButton } from '@/components/events/add-to-calendar-button';
+import { ShareButton } from '@/components/events/share-button';
 import { CATEGORY_COLORS } from '@/types/database';
-import { cn, formatDate, formatDateTime, getSeatsPercentage } from '@/lib/utils';
+import { cn, formatDate, formatDateTime, getSeatsPercentage, isEventPast } from '@/lib/utils';
 import { getWaitlistCount } from '@/lib/actions/waitlist';
+import { getEventFeedback } from '@/lib/actions/feedback';
 import { QRCodeSVG } from 'qrcode.react';
 import { EventDetailShaderBg } from '@/components/events/event-detail-shader-bg';
+import { PostEventActions } from '@/components/events/post-event-actions';
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const id = (await params).id;
@@ -85,6 +88,10 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
   // Get waitlist count for display
   const waitlistCount = await getWaitlistCount(event.id);
 
+  // Get feedback ratings
+  const feedbackData = await getEventFeedback(event.id);
+  const { average: averageRating, count: feedbackCount } = feedbackData;
+
   // getSeatsPercentage returns FILL percentage (how much is taken)
   const fillPercentage = getSeatsPercentage(event.seats_remaining, event.total_seats);
   
@@ -124,7 +131,24 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
         <div className="p-6 md:p-8 md:flex gap-8">
           <div className="md:w-2/3 space-y-6">
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">{event.title}</h1>
+              <div className="flex items-start justify-between gap-4 mb-4">
+                <h1 className="text-3xl md:text-4xl font-bold tracking-tight flex-1">{event.title}</h1>
+                <ShareButton eventId={event.id} eventTitle={event.title} variant="outline" size="icon" />
+              </div>
+              
+              {/* Rating Display - only for past events with feedback */}
+              {isEventPast(event.event_date) && (feedbackCount || 0) > 0 && (
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="flex items-center gap-1">
+                    <Star className="w-5 h-5 fill-amber-400 text-amber-400" />
+                    <span className="font-semibold text-lg">{averageRating}</span>
+                  </div>
+                  <span className="text-sm text-muted-foreground">
+                    · {feedbackCount} {feedbackCount === 1 ? 'review' : 'reviews'}
+                  </span>
+                </div>
+              )}
+              
               <div className="prose prose-sm md:prose-base dark:prose-invert max-w-none">
                 <p className="whitespace-pre-line text-muted-foreground">{event.description}</p>
               </div>
@@ -215,22 +239,29 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
               {registration ? (
                 <div className="space-y-4 pt-2">
                   <div className="bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400 p-3 rounded-md text-sm font-medium text-center border border-green-200 dark:border-green-900">
-                    You are registered for this event!
+                    {isEventPast(event.event_date) ? "This event has concluded." : "You are registered for this event!"}
                   </div>
-                  {registration.qr_code && (
-                    <div className="flex flex-col items-center justify-center p-4 bg-white dark:bg-gray-900 rounded-lg border">
-                      <QRCodeSVG value={registration.qr_code} size={150} />
-                      <div className="mt-3 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded text-xs font-mono break-all text-center">
-                        {registration.qr_code}
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-2 text-center">
-                        Show this QR code at the venue for check-in
-                      </p>
-                    </div>
+                  
+                  {isEventPast(event.event_date) ? (
+                    <PostEventActions registration={registration} event={event} />
+                  ) : (
+                    <>
+                      {registration.qr_code && (
+                        <div className="flex flex-col items-center justify-center p-4 bg-white dark:bg-gray-900 rounded-lg border">
+                          <QRCodeSVG value={registration.qr_code} size={150} />
+                          <div className="mt-3 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded text-xs font-mono break-all text-center">
+                            {registration.qr_code}
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-2 text-center">
+                            Show this QR code at the venue for check-in
+                          </p>
+                        </div>
+                      )}
+                      <Link href="/dashboard" className="block w-full">
+                        <Button variant="outline" className="w-full">Manage Registration</Button>
+                      </Link>
+                    </>
                   )}
-                  <Link href="/dashboard" className="block w-full">
-                    <Button variant="outline" className="w-full">Manage Registration</Button>
-                  </Link>
                 </div>
               ) : (
                 <RegisterButton 

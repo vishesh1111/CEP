@@ -87,10 +87,10 @@ begin
 
   -- Insert or re-confirm registration
   insert into public.registrations (user_id, event_id, qr_code)
-  values (p_user_id, p_event_id, encode(gen_random_bytes(12), 'hex'))
+  values (p_user_id, p_event_id, 'REG-' || UPPER(encode(gen_random_bytes(3), 'hex')))
   on conflict (user_id, event_id)
     do update set status = 'confirmed',
-                  qr_code = encode(gen_random_bytes(12), 'hex')
+                  qr_code = 'REG-' || UPPER(encode(gen_random_bytes(3), 'hex'))
   returning * into v_reg;
 
   return v_reg;

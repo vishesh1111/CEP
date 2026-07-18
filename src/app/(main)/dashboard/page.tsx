@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { Calendar, Bell } from 'lucide-react';
+import { Calendar, Bell, History } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { RegistrationCard } from '@/components/dashboard/registration-card';
@@ -68,6 +68,10 @@ export default async function DashboardPage() {
           <div className="text-4xl font-bold mb-1">{registrations.length}</div>
           <div className="text-sm font-medium text-muted-foreground">Total Registrations</div>
         </div>
+        <div className="bg-muted/20 border border-dashed rounded-xl p-6 flex flex-col justify-center">
+          <div className="text-4xl font-bold mb-1">{pastRegistrations.length}</div>
+          <div className="text-sm font-medium text-muted-foreground">Past Events</div>
+        </div>
       </div>
 
       <Tabs defaultValue="events" className="w-full">
@@ -100,16 +104,22 @@ export default async function DashboardPage() {
             )}
           </div>
           
-          {pastRegistrations.length > 0 && (
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Past Events</h2>
+          <div className="space-y-4 pt-4">
+            <h2 className="text-xl font-semibold">Past Events</h2>
+            {pastRegistrations.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 opacity-75">
                 {pastRegistrations.map(reg => (
                   <RegistrationCard key={reg.id} registration={reg} isPast={true} />
                 ))}
               </div>
-            </div>
-          )}
+            ) : (
+              <div className="bg-muted/30 border border-dashed rounded-xl p-8 text-center">
+                <History className="w-10 h-10 text-muted-foreground mx-auto mb-3 opacity-50" />
+                <h3 className="font-medium mb-1">No past events</h3>
+                <p className="text-sm text-muted-foreground mb-4">You haven't attended any events yet.</p>
+              </div>
+            )}
+          </div>
         </TabsContent>
         
         <TabsContent value="announcements" className="focus-visible:outline-none focus-visible:ring-0">

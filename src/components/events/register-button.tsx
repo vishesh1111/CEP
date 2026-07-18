@@ -5,7 +5,7 @@ import { CheckCircle, Loader2, Clock, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { isDeadlinePassed } from '@/lib/utils';
-import { registerForEvent } from '@/lib/actions/registration';
+import { registerForEvent, cancelRegistration } from '@/lib/actions/registration';
 import { joinWaitlist, leaveWaitlist } from '@/lib/actions/waitlist';
 import { Registration } from '@/types/database';
 
@@ -47,7 +47,28 @@ export function RegisterButton({
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success("Successfully registered for event!");
+        const registrationId = (result.data as any)?.id;
+        
+        toast.success("Successfully registered for event!", {
+          action: registrationId ? {
+            label: 'Undo',
+            onClick: async () => {
+              setIsLoading(true);
+              try {
+                const cancelResult = await cancelRegistration(registrationId);
+                if (cancelResult.error) {
+                  toast.error(cancelResult.error);
+                } else {
+                  toast.success("Registration undone");
+                }
+              } catch (e) {
+                toast.error("Failed to undo registration");
+              } finally {
+                setIsLoading(false);
+              }
+            }
+          } : undefined
+        });
       }
     } catch (error) {
       toast.error("An unexpected error occurred.");

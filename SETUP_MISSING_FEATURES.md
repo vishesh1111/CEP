@@ -1,3 +1,23 @@
+# Fix Missing Features - Setup Guide
+
+## Problem
+You can't see the "Add to Calendar", "Waitlist", and related features even though they're fully implemented in code.
+
+## Root Cause
+The **waitlist database table hasn't been created yet**. The code references this table but it doesn't exist in your Supabase database.
+
+## Solution - Run This SQL Migration
+
+### Step 1: Open Supabase SQL Editor
+1. Go to your Supabase dashboard
+2. Navigate to: **SQL Editor** (left sidebar)
+3. Click **New Query**
+
+### Step 2: Copy and Run This SQL
+
+**IMPORTANT**: Copy the ACTUAL SQL code below (not the filename):
+
+```sql
 -- Create waitlist table
 CREATE TABLE IF NOT EXISTS public.waitlist (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -63,12 +83,11 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Drop existing cancel_registration function with all possible signatures
+-- Drop existing cancel_registration function first
 DROP FUNCTION IF EXISTS cancel_registration(UUID, UUID);
-DROP FUNCTION IF EXISTS public.cancel_registration(p_registration_id UUID, p_user_id UUID);
 
 -- Update cancel_registration function to handle waitlist promotion
-CREATE OR REPLACE FUNCTION public.cancel_registration(
+CREATE OR REPLACE FUNCTION cancel_registration(
   p_registration_id UUID,
   p_user_id UUID
 ) RETURNS JSON AS $$
@@ -139,3 +158,60 @@ BEGIN
   END IF;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
+```
+
+### Step 3: Click "Run" Button
+
+You should see: `Success. No rows returned`
+
+## What Features Will Work After This:
+
+### 1. Add to Calendar Button ✅
+- Located on every event detail page
+- Dropdown menu with:
+  - **Download .ics File** - Works with any calendar app
+  - **Google Calendar** - Opens Google Calendar with pre-filled event
+
+### 2. Waitlist System ✅
+- Automatically appears when event is full (`seats_remaining = 0`)
+- Shows "Join Waitlist" button instead of "Register Now"
+- Displays waitlist position (e.g., "Position #3")
+- Auto-promotes first person when someone cancels
+- Sends email notification to promoted user
+
+### 3. Where to See Them:
+- **Add to Calendar**: Go to any event detail page → Look for calendar icon button below the register button
+- **Waitlist**: Create a test event with only 1 seat, register as one user, then try to register as another user → You'll see "Join Waitlist" button
+
+## Testing Steps:
+
+1. **Test Add to Calendar**:
+   - Go to `/events` page
+   - Click on any event
+   - Scroll to the event details sidebar (right side)
+   - You should see "Add to Calendar" button with calendar icon
+   - Click it and try both download options
+
+2. **Test Waitlist**:
+   - As admin, create an event with `total_seats = 1`
+   - Register as a student (use one account)
+   - Logout and try to register with another account
+   - You should see "Join Waitlist" button instead of "Register Now"
+   - Click it and you'll see "Position #1 in queue"
+
+## Still Not Working?
+
+Check browser console (F12) for errors. Common issues:
+- Clear browser cache and hard refresh (Ctrl+Shift+R / Cmd+Shift+R)
+- Make sure you're on the latest code (pull/restart dev server)
+- Verify Supabase connection is working
+
+## Architecture Summary:
+
+The features are split into:
+- **Frontend Components**: `add-to-calendar-button.tsx`, `register-button.tsx` (contains waitlist UI)
+- **Server Actions**: `waitlist.ts` (join/leave/position functions)
+- **Database**: `waitlist` table + `cancel_registration` RPC function
+- **Utilities**: `calendar.ts` (ICS generation, Google Calendar URLs)
+
+All pieces are in place — you just need to run the SQL migration above!

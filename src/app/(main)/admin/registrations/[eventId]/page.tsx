@@ -14,7 +14,7 @@ export default async function EventRegistrationsPage({ params }: { params: Promi
   const { data: registrations } = await supabase.from('registrations').select('*, users(*)').eq('event_id', resolvedParams.eventId).eq('status', 'confirmed') as unknown as { data: (Registration & { users: User })[] };
 
   return (
-    <div className="space-y-6">
+    <div className="container mx-auto py-8 px-4 space-y-6">
       <div className="flex items-center gap-4">
         <Link href="/admin/events">
           <Button variant="outline" size="icon">

@@ -22,7 +22,7 @@ const itemVariants = {
   visible: { 
     opacity: 1, 
     y: 0,
-    transition: { type: "spring", stiffness: 300, damping: 24 }
+    transition: { type: "spring" as const, stiffness: 300, damping: 24 }
   },
 };
 
@@ -46,14 +46,14 @@ export function AnimatedAbout() {
         
         <motion.h1 
           variants={itemVariants} 
-          className="text-4xl md:text-6xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground via-foreground/90 to-foreground/70"
+          className="text-4xl md:text-6xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300"
         >
           Why CampusEvents?
         </motion.h1>
         
         <motion.p 
           variants={itemVariants} 
-          className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto font-medium"
+          className="text-lg md:text-xl text-gray-700 dark:text-gray-300 max-w-2xl mx-auto font-medium"
         >
           Built for students who are tired of missing out on campus life.
         </motion.p>
@@ -71,20 +71,20 @@ export function AnimatedAbout() {
           <div className="md:col-span-5 relative">
             <div className="absolute -inset-4 bg-gradient-to-tr from-red-500/10 to-amber-500/10 rounded-3xl blur-2xl -z-10" />
             <motion.div variants={itemVariants} className="h-full w-1 bg-gradient-to-b from-red-500 to-amber-500 rounded-full absolute left-0 top-0 hidden md:block" />
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground/90 md:pl-8">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100 md:pl-8">
               The Problem We Solve
             </h2>
           </div>
           
           <div className="md:col-span-7 space-y-6 md:pl-8 border-l-4 border-red-500/20 md:border-none pl-4">
-            <motion.p variants={itemVariants} className="text-lg md:text-xl text-muted-foreground leading-relaxed">
-              If you've ever <span className="font-semibold text-foreground">missed a workshop because it was buried in a WhatsApp group</span>, 
-              or shown up to a "fest" only to find it was <span className="font-semibold text-foreground">cancelled last week</span>, 
+            <motion.p variants={itemVariants} className="text-lg md:text-xl text-gray-700 dark:text-gray-300 leading-relaxed">
+              If you've ever <span className="font-semibold text-gray-900 dark:text-white">missed a workshop because it was buried in a WhatsApp group</span>, 
+              or shown up to a "fest" only to find it was <span className="font-semibold text-gray-900 dark:text-white">cancelled last week</span>, 
               you already know the problem.
             </motion.p>
-            <motion.p variants={itemVariants} className="text-lg md:text-xl text-muted-foreground leading-relaxed">
+            <motion.p variants={itemVariants} className="text-lg md:text-xl text-gray-700 dark:text-gray-300 leading-relaxed">
               Campus events are scattered across group chats, notice boards, and half-updated spreadsheets — and by the time 
-              information reaches you, <span className="font-semibold text-foreground">half the seats are already gone</span>.
+              information reaches you, <span className="font-semibold text-gray-900 dark:text-white">half the seats are already gone</span>.
             </motion.p>
           </div>
         </motion.div>
@@ -106,9 +106,9 @@ export function AnimatedAbout() {
           </div>
           
           <div className="md:col-span-7 space-y-6 md:pl-8 border-l-4 border-blue-500/20 md:border-none pl-4">
-            <motion.p variants={itemVariants} className="text-lg md:text-xl text-muted-foreground leading-relaxed">
-              <span className="font-bold text-foreground">One place</span> to discover what's happening. 
-              <span className="font-bold text-foreground"> Register in seconds</span>, and know exactly where you stand — 
+            <motion.p variants={itemVariants} className="text-lg md:text-xl text-gray-700 dark:text-gray-300 leading-relaxed">
+              <span className="font-bold text-gray-900 dark:text-white">One place</span> to discover what's happening. 
+              <span className="font-bold text-gray-900 dark:text-white"> Register in seconds</span>, and know exactly where you stand — 
               confirmed, waitlisted, or checked in.
             </motion.p>
           </div>
@@ -194,9 +194,9 @@ export function AnimatedAbout() {
           className="text-center pt-16 pb-8"
         >
           <div className="max-w-3xl mx-auto space-y-8">
-            <motion.p variants={itemVariants} className="text-xl md:text-2xl font-medium text-muted-foreground leading-relaxed">
+            <motion.p variants={itemVariants} className="text-xl md:text-2xl font-medium text-gray-700 dark:text-gray-300 leading-relaxed">
               Built for students, by students. Because campus life is busy enough — 
-              <span className="font-bold text-foreground"> managing events shouldn't be</span>.
+              <span className="font-bold text-gray-900 dark:text-white"> managing events shouldn't be</span>.
             </motion.p>
             
             <motion.div variants={itemVariants} className="pt-6">

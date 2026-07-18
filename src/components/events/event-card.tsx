@@ -9,6 +9,7 @@ import { Event, Registration, CATEGORY_COLORS } from '@/types/database';
 import { cn, formatDate, isDeadlinePassed, getSeatsPercentage } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { RegisterButton } from './register-button';
+import { ShareButton } from './share-button';
 
 interface EventCardProps {
   event: Event;
@@ -65,6 +66,9 @@ export function EventCard({ event, userRegistration, waitlistCount = 0, index = 
               Registered ✓
             </Badge>
           )}
+        </div>
+        <div className="absolute top-3 left-3" onClick={(e) => e.stopPropagation()}>
+          <ShareButton eventId={event.id} eventTitle={event.title} variant="ghost" size="icon" />
         </div>
       </div>
       

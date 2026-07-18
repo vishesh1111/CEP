@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { CalendarDays, Mail, Heart } from 'lucide-react';
+import { CalendarDays, Mail } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 
 export function Footer() {
@@ -50,10 +50,7 @@ export function Footer() {
 
         <Separator className="my-6" />
 
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-          <p className="flex items-center gap-1">
-            Made with <Heart className="h-3.5 w-3.5 text-red-500 fill-red-500" /> for Campus
-          </p>
+        <div className="flex items-center justify-center text-sm text-muted-foreground">
           <p>&copy; {new Date().getFullYear()} CampusEvents. All rights reserved.</p>
         </div>
       </div>
