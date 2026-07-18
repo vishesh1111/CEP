@@ -37,7 +37,7 @@ export async function inviteAdmin(email: string) {
   }
   
   // Check if invitation already exists
-  const { data: existingInvite } = await supabase
+  const { data: existingInvite } = await (supabase as any)
     .from('admin_invitations')
     .select('*')
     .eq('email', email)
@@ -49,7 +49,7 @@ export async function inviteAdmin(email: string) {
   }
   
   // Create invitation
-  const { data: invitation, error } = await supabase
+  const { data: invitation, error } = await (supabase as any)
     .from('admin_invitations')
     .insert({
       email,
@@ -74,7 +74,7 @@ export async function inviteAdmin(email: string) {
 export async function getAdminInvitations() {
   const supabase = await createClient();
   
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('admin_invitations')
     .select(`
       *,
@@ -92,7 +92,7 @@ export async function getAdminInvitations() {
 export async function revokeAdminInvitation(invitationId: string) {
   const supabase = await createClient();
   
-  const { error } = await supabase
+  const { error } = await (supabase as any)
     .from('admin_invitations')
     .update({ status: 'expired' })
     .eq('id', invitationId);
@@ -109,7 +109,7 @@ export async function resendAdminInvitation(email: string) {
   const supabase = await createClient();
   
   // Expire old invitation
-  await supabase
+  await (supabase as any)
     .from('admin_invitations')
     .update({ status: 'expired' })
     .eq('email', email)
@@ -122,7 +122,7 @@ export async function resendAdminInvitation(email: string) {
 export async function checkAdminInvitation(email: string) {
   const supabase = await createClient();
   
-  const { data } = await supabase
+  const { data } = await (supabase as any)
     .from('admin_invitations')
     .select('*')
     .eq('email', email)

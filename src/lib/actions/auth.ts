@@ -8,7 +8,7 @@ export async function signUp(formData: { name: string; email: string; password: 
   const supabase = await createClient();
 
   // Check if user has admin invitation
-  const { data: invitation } = await supabase
+  const { data: invitation } = await (supabase as any)
     .from('admin_invitations')
     .select('*')
     .eq('email', formData.email)
@@ -39,7 +39,7 @@ export async function signUp(formData: { name: string; email: string; password: 
 
   // If admin invitation exists, mark it as accepted
   if (invitation) {
-    await supabase
+    await (supabase as any)
       .from('admin_invitations')
       .update({ 
         status: 'accepted',

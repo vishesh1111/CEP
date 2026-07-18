@@ -6,6 +6,8 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { CATEGORY_COLORS } from '@/types/database';
+import { useTheme } from 'next-themes';
+import { PulsingBorder } from '@paper-design/shaders-react';
 
 const localizer = momentLocalizer(moment);
 
@@ -25,6 +27,12 @@ export default function CalendarPage() {
   const [date, setDate] = useState(new Date());
   const supabase = createClient();
   const router = useRouter();
+  const { resolvedTheme } = useTheme();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     async function loadEvents() {
@@ -33,7 +41,7 @@ export default function CalendarPage() {
         setEvents(data.map((e: any) => {
           const eventDate = new Date(e.event_date);
           const endDate = new Date(eventDate.getTime() + 2 * 60 * 60 * 1000); // 2 hours later
-          
+
           return {
             id: e.id,
             title: e.title,
@@ -81,11 +89,13 @@ export default function CalendarPage() {
 
   // Custom event component to show time + title
   const EventComponent = ({ event }: { event: EventData }) => (
-    <div className="flex flex-col">
-      <strong className="text-xs">{moment(event.start).format('h:mm A')}</strong>
+    <div className="flex flex-row items-baseline gap-1.5 truncate">
+      <strong className="text-[10px] whitespace-nowrap">{moment(event.start).format('h:mm A')}</strong>
       <span className="text-xs truncate">{event.title}</span>
     </div>
   );
+
+  const isDark = resolvedTheme === 'dark';
 
   return (
     <div className="container mx-auto py-8 px-4 space-y-6 pb-8 animate-fade-in-up">
@@ -359,8 +369,29 @@ export default function CalendarPage() {
             padding: 2px 4px;
           }
         }
+
+        /* Light Mode Gradient Border */
+        .calendar-card-light::before {
+          content: '';
+          position: absolute;
+          inset: -2px;
+          border-radius: inherit;
+          padding: 2px;
+          background: linear-gradient(120deg, #6366f1, #a855f7, #6366f1);
+          background-size: 200% 200%;
+          animation: borderFlow 6s ease infinite;
+          -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          -webkit-mask-composite: xor;
+          mask-composite: exclude;
+          pointer-events: none;
+          z-index: -1;
+        }
+        @keyframes borderFlow {
+          0%, 100% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+        }
       `}</style>
-      
+
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <h1 className="text-3xl font-bold tracking-tight">Events Calendar</h1>
         <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
@@ -378,8 +409,31 @@ export default function CalendarPage() {
           </div>
         </div>
       </div>
-      
-      <div className="border rounded-lg p-6 bg-card shadow-sm" style={{ minHeight: '750px' }}>
+
+      <div
+        className={`relative border rounded-lg p-6 bg-card z-0 transition-all duration-300 ${!isDark ? 'calendar-card-light' : ''}`}
+        style={{ minHeight: '750px' }}
+      >
+        {isMounted && isDark && (
+          <div className="absolute inset-0 -z-10 pointer-events-none rounded-lg">
+            <PulsingBorder
+              colors={['#6366f1']}
+              colorBack="#ffffff00"
+              intensity={0.15}
+              bloom={0.2}
+              pulse={0.1}
+              speed={0.9}
+              scale={1}
+              fit="cover"
+              thickness={0.02}
+              style={{
+                width: '100%',
+                height: '100%',
+                display: 'block'
+              }}
+            />
+          </div>
+        )}
         <Calendar
           localizer={localizer}
           events={events}

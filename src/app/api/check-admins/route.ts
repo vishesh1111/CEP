@@ -67,7 +67,7 @@ export async function GET() {
       })) || [],
       message: adminUsers?.length === 0 
         ? '⚠️ No admin users found! You need to create one manually via SQL.' 
-        : `✅ Found ${adminUsers.length} admin user(s)`
+        : `✅ Found ${adminUsers?.length || 0} admin user(s)`
     });
     
   } catch (error: any) {

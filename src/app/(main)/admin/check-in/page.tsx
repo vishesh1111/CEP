@@ -19,7 +19,7 @@ interface CheckInResult {
   event_id: string;
   status: string;
   checked_in: boolean;
-  qr_code: string;
+  qr_code: string | null;
   registered_at: string;
   user?: {
     name: string;

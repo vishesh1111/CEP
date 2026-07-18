@@ -8,9 +8,12 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { RegisterButton } from '@/components/events/register-button';
+import { AddToCalendarButton } from '@/components/events/add-to-calendar-button';
 import { CATEGORY_COLORS } from '@/types/database';
 import { cn, formatDate, formatDateTime, getSeatsPercentage } from '@/lib/utils';
+import { getWaitlistCount } from '@/lib/actions/waitlist';
 import { QRCodeSVG } from 'qrcode.react';
+import { EventDetailShaderBg } from '@/components/events/event-detail-shader-bg';
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const id = (await params).id;
@@ -39,7 +42,11 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
   if (error || !event) notFound();
 
   let registration = null;
+  let isOnWaitlist = false;
+  let waitlistPosition: number | null = null;
+
   if (user) {
+    // Check registration
     const { data } = await supabase
       .from('registrations')
       .select('*')
@@ -48,6 +55,25 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
       .eq('status', 'confirmed')
       .single() as any;
     if (data) registration = data;
+
+    // Check waitlist status
+    const { data: waitlistEntry } = await (supabase as any)
+      .from('waitlist')
+      .select('joined_at')
+      .eq('user_id', user.id)
+      .eq('event_id', event.id)
+      .single();
+
+    if (waitlistEntry) {
+      isOnWaitlist = true;
+      // Get position
+      const { count } = await (supabase as any)
+        .from('waitlist')
+        .select('*', { count: 'exact', head: true })
+        .eq('event_id', event.id)
+        .lte('joined_at', waitlistEntry.joined_at);
+      waitlistPosition = count || 1;
+    }
   }
 
   const { data: announcements } = await supabase
@@ -55,6 +81,9 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
     .select('*')
     .eq('event_id', event.id)
     .order('posted_at', { ascending: false }) as any;
+
+  // Get waitlist count for display
+  const waitlistCount = await getWaitlistCount(event.id);
 
   // getSeatsPercentage returns FILL percentage (how much is taken)
   const fillPercentage = getSeatsPercentage(event.seats_remaining, event.total_seats);
@@ -68,7 +97,9 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
   }
   
   return (
-    <div className="container mx-auto py-8 px-4 max-w-5xl">
+    <div className="relative container mx-auto py-8 px-4 max-w-5xl min-h-screen overflow-x-hidden">
+      {/* Ambient SmokeRing shader — sits behind content at -z-10 */}
+      <EventDetailShaderBg />
       <Link href="/events" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors">
         <ArrowLeft className="w-4 h-4 mr-2" />
         Back to Events
@@ -170,6 +201,11 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
                         style={{ width: `${fillPercentage}%` }}
                       />
                     </div>
+                    {event.seats_remaining === 0 && waitlistCount > 0 && (
+                      <div className="text-xs text-amber-600 dark:text-amber-400 mt-1.5 font-medium">
+                        {waitlistCount} {waitlistCount === 1 ? 'person' : 'people'} on waitlist
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -201,9 +237,21 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
                   eventId={event.id}
                   deadline={event.registration_deadline}
                   seatsRemaining={event.seats_remaining}
+                  isOnWaitlist={isOnWaitlist}
+                  waitlistPosition={waitlistPosition}
                   className="w-full h-12 text-md"
                 />
               )}
+
+              {/* Add to Calendar — visible to everyone */}
+              <AddToCalendarButton
+                title={event.title}
+                description={event.description}
+                eventDate={event.event_date}
+                venue={event.venue}
+                eventId={event.id}
+                className="w-full"
+              />
             </div>
           </div>
         </div>

@@ -84,7 +84,7 @@ export async function GET() {
     }
   ];
 
-  const { data, error } = await supabase.from('events').insert(events).select();
+  const { data, error } = await supabase.from('events').insert(events as any).select();
   
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

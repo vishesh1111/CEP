@@ -33,7 +33,7 @@ export async function removeUserRegistration(registrationId: string, eventId: st
   }
   
   // Increment seats_remaining
-  const { error: updateError } = await supabase.rpc('increment_seats', {
+  const { error: updateError } = await supabase.rpc('increment_seats' as any, {
     event_id: eventId
   });
   
@@ -67,8 +67,8 @@ export async function banUserFromEvent(userId: string, eventId: string) {
     return { error: 'Unauthorized: Only admins can ban users' };
   }
   
-  // Add to banned_users table (we'll create this)
-  const { error } = await supabase
+  // Add to banned_users table
+  const { error } = await (supabase as any)
     .from('banned_users')
     .insert({
       user_id: userId,
@@ -99,7 +99,7 @@ export async function banUserFromEvent(userId: string, eventId: string) {
 export async function unbanUserFromEvent(userId: string, eventId: string) {
   const supabase = await createClient();
   
-  const { error } = await supabase
+  const { error } = await (supabase as any)
     .from('banned_users')
     .delete()
     .eq('user_id', userId)
@@ -113,3 +113,4 @@ export async function unbanUserFromEvent(userId: string, eventId: string) {
   
   return { success: true, message: 'User unbanned from event successfully' };
 }
+

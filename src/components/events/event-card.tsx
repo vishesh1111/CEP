@@ -13,10 +13,11 @@ import { RegisterButton } from './register-button';
 interface EventCardProps {
   event: Event;
   userRegistration?: Registration;
+  waitlistCount?: number;
   index?: number;
 }
 
-export function EventCard({ event, userRegistration, index = 0 }: EventCardProps) {
+export function EventCard({ event, userRegistration, waitlistCount = 0, index = 0 }: EventCardProps) {
   const router = useRouter();
   
   // getSeatsPercentage returns FILL percentage (how much is taken)
@@ -95,6 +96,11 @@ export function EventCard({ event, userRegistration, index = 0 }: EventCardProps
                 style={{ width: `${fillPercentage}%` }}
               />
             </div>
+            {event.seats_remaining === 0 && waitlistCount > 0 && (
+              <div className="text-xs text-amber-600 dark:text-amber-400 mt-1 font-medium">
+                {waitlistCount} {waitlistCount === 1 ? 'person' : 'people'} waiting
+              </div>
+            )}
           </div>
         </div>
       </CardContent>

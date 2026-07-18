@@ -29,7 +29,7 @@ interface Invitation {
   invited_by_user: {
     name: string;
     email: string;
-  } | null;
+  }[] | null;
 }
 
 interface InvitationsTableProps {
@@ -141,7 +141,7 @@ export function InvitationsTable({ invitations }: InvitationsTableProps) {
                   {getStatusBadge(invitation.status, invitation.expires_at)}
                 </td>
                 <td className="py-3 px-2 text-sm text-muted-foreground">
-                  {invitation.invited_by_user?.name || 'Unknown'}
+                  {invitation.invited_by_user?.[0]?.name || 'Unknown'}
                 </td>
                 <td className="py-3 px-2 text-sm text-muted-foreground">
                   {isPending ? (
@@ -171,16 +171,18 @@ export function InvitationsTable({ invitations }: InvitationsTableProps) {
                         </Button>
                         
                         <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              disabled={processingId === invitation.id}
-                              className="text-destructive hover:text-destructive"
-                              title="Revoke invitation"
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
+                          <AlertDialogTrigger
+                            render={
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                disabled={processingId === invitation.id}
+                                className="text-destructive hover:text-destructive"
+                                title="Revoke invitation"
+                              />
+                            }
+                          >
+                            <X className="h-4 w-4" />
                           </AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader>

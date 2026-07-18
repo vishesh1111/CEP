@@ -77,8 +77,7 @@ export function Header() {
     { href: '/', label: 'Discover' },
     { href: '/events', label: 'Events' },
     { href: '/events/calendar', label: 'Calendar' },
-    { href: '#', label: 'Organizers' },
-    { href: '#', label: 'About' },
+    { href: '/about', label: 'About' },
     ...(user ? [{ href: '/dashboard', label: 'Dashboard' }] : []),
     ...(role === 'admin' ? [{ href: '/admin', label: 'Admin' }] : []),
   ];

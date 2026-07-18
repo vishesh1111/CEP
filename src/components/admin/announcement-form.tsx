@@ -70,7 +70,7 @@ export function AnnouncementForm({ events }: AnnouncementFormProps) {
       const result = await createAnnouncement({
         title: data.title,
         message: data.message,
-        event_id: data.type === 'event' ? data.eventId : null,
+        event_id: data.type === 'event' ? data.eventId : undefined,
       });
       
       if (result.error) {

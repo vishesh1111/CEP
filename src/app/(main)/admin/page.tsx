@@ -85,14 +85,6 @@ export default async function AdminDashboard() {
           animation-delay: 0.5s;
           opacity: 0;
         }
-        
-        .glow-card {
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .glow-card:hover {
-          box-shadow: 0 10px 40px -10px rgba(var(--primary), 0.3);
-        }
       `}</style>
       
       <div className="animate-fade-in-up">
@@ -104,7 +96,7 @@ export default async function AdminDashboard() {
 
       {/* Stats Grid */}
       <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-        <Card className="animate-fade-in-up delay-100 glow-card border-border/50 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
+        <Card className="animate-fade-in-up delay-100 hover:shadow-md hover:border-primary/30 transition-all hover:-translate-y-1 border-border/50 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <CardTitle className="text-sm font-semibold text-muted-foreground">Total Events</CardTitle>
             <div className="p-2 rounded-lg bg-primary/10">
@@ -117,7 +109,7 @@ export default async function AdminDashboard() {
           </CardContent>
         </Card>
         
-        <Card className="animate-fade-in-up delay-200 glow-card border-border/50 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
+        <Card className="animate-fade-in-up delay-200 hover:shadow-md hover:border-primary/30 transition-all hover:-translate-y-1 border-border/50 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <CardTitle className="text-sm font-semibold text-muted-foreground">Registrations</CardTitle>
             <div className="p-2 rounded-lg bg-blue-500/10">
@@ -130,7 +122,7 @@ export default async function AdminDashboard() {
           </CardContent>
         </Card>
         
-        <Card className="animate-fade-in-up delay-300 glow-card border-border/50 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
+        <Card className="animate-fade-in-up delay-300 hover:shadow-md hover:border-primary/30 transition-all hover:-translate-y-1 border-border/50 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <CardTitle className="text-sm font-semibold text-muted-foreground">Students</CardTitle>
             <div className="p-2 rounded-lg bg-green-500/10">
@@ -143,7 +135,7 @@ export default async function AdminDashboard() {
           </CardContent>
         </Card>
         
-        <Card className="animate-fade-in-up delay-400 glow-card border-border/50 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
+        <Card className="animate-fade-in-up delay-400 hover:shadow-md hover:border-primary/30 transition-all hover:-translate-y-1 border-border/50 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <CardTitle className="text-sm font-semibold text-muted-foreground">Checked In</CardTitle>
             <div className="p-2 rounded-lg bg-purple-500/10">
@@ -180,7 +172,7 @@ export default async function AdminDashboard() {
       </div>
 
       {/* Recent Registrations */}
-      <Card className="animate-fade-in-up delay-500 glow-card border-border/50 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
+      <Card className="animate-fade-in-up delay-500 hover:shadow-md hover:border-primary/30 transition-all border-border/50 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
         <CardHeader className="border-b border-border/50 pb-4">
           <CardTitle className="text-xl font-bold">Recent Registrations</CardTitle>
           <p className="text-sm text-muted-foreground mt-1">Latest student sign-ups across all events</p>

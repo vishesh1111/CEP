@@ -48,7 +48,7 @@ export default async function AdminInvitationsPage() {
               Error loading invitations: {error}
             </div>
           ) : (
-            <InvitationsTable invitations={invitations || []} />
+            <InvitationsTable invitations={(invitations as any) || []} />
           )}
         </div>
       </div>

@@ -4,6 +4,16 @@ import { createClient } from '@/lib/supabase/server';
 export async function GET() {
   const supabase = await createClient();
   
+  // Get the current user or an admin user to be the creator
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) {
+    return NextResponse.json(
+      { success: false, error: 'Not authenticated' },
+      { status: 401 }
+    );
+  }
+  
   const now = new Date();
   
   const testEvents = [
@@ -16,7 +26,8 @@ export async function GET() {
       category: 'academic',
       total_seats: 100,
       seats_remaining: 87,
-      banner_url: null
+      banner_url: '/FutureOfAI.png',
+      created_by: user.id
     },
     {
       title: '[TEST] Annual Music Fest 2026',
@@ -27,7 +38,8 @@ export async function GET() {
       category: 'cultural',
       total_seats: 150,
       seats_remaining: 2,
-      banner_url: null
+      banner_url: '/AnnualMusicFest.png',
+      created_by: user.id
     },
     {
       title: '[TEST] Career Fair 2026',
@@ -38,7 +50,8 @@ export async function GET() {
       category: 'career',
       total_seats: 200,
       seats_remaining: 0,
-      banner_url: null
+      banner_url: '/CareerFair.png',
+      created_by: user.id
     },
     {
       title: '[TEST] Marathon for Charity',
@@ -49,7 +62,8 @@ export async function GET() {
       category: 'sports',
       total_seats: 300,
       seats_remaining: 45,
-      banner_url: null
+      banner_url: '/MarathonForCharity.jpg',
+      created_by: user.id
     },
     {
       title: '[TEST] Web Development Bootcamp',
@@ -60,7 +74,8 @@ export async function GET() {
       category: 'workshop',
       total_seats: 40,
       seats_remaining: 28,
-      banner_url: null
+      banner_url: '/webdevbootcamp.png',
+      created_by: user.id
     },
     {
       title: '[TEST] Inter-College Basketball Tournament',
@@ -71,7 +86,8 @@ export async function GET() {
       category: 'sports',
       total_seats: 500,
       seats_remaining: 320,
-      banner_url: null
+      banner_url: '/Basketball.png',
+      created_by: user.id
     }
   ];
   
@@ -89,7 +105,7 @@ export async function GET() {
     // Insert new events
     const { data, error } = await supabase
       .from('events')
-      .insert(testEvents)
+      .insert(testEvents as any)
       .select();
     
     if (error) {

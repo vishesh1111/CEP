@@ -54,6 +54,11 @@ export function EventFilters() {
   const currentSort = searchParams.get('sort') || 'date_asc';
   const sortLabel = sortOptions.find(opt => opt.value === currentSort)?.label || 'Sort by';
 
+  const currentCategory = searchParams.get('category') || 'all';
+  const categoryLabel = currentCategory === 'all' 
+    ? 'All Categories' 
+    : EVENT_CATEGORIES.find(c => c.value === currentCategory)?.label || 'All Categories';
+
   return (
     <div className="flex flex-col sm:flex-row gap-4 mb-8">
       <div className="relative flex-grow">
@@ -68,11 +73,11 @@ export function EventFilters() {
       
       <div className="flex gap-4 w-full sm:w-auto">
         <Select 
-          value={searchParams.get('category') || 'all'} 
+          value={currentCategory} 
           onValueChange={(val) => val && handleCategoryChange(val)}
         >
           <SelectTrigger className="w-full sm:w-[160px] bg-background">
-            <SelectValue placeholder="Category" />
+            <span className="flex-1 text-left">{categoryLabel}</span>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Categories</SelectItem>
