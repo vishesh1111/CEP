@@ -35,8 +35,6 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-import { isRedirectError } from 'next/dist/client/components/redirect';
-
 export default function RegisterPage() {
   const [isPending, setIsPending] = React.useState(false);
 
@@ -64,8 +62,8 @@ export default function RegisterPage() {
       } else {
         toast.success('Account created successfully!');
       }
-    } catch (error) {
-      if (isRedirectError(error)) {
+    } catch (error: any) {
+      if (error?.message?.includes('NEXT_REDIRECT') || error?.digest?.includes('NEXT_REDIRECT')) {
         throw error;
       }
       toast.error('An unexpected error occurred');
