@@ -5,21 +5,28 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { Registration, User } from '@/types/database';
+import { RegistrationActions } from '@/components/admin/registration-actions';
 
-export default async function EventRegistrationsPage({ params }: { params: { eventId: string } }) {
+export default async function EventRegistrationsPage({ params }: { params: Promise<{ eventId: string }> }) {
+  const resolvedParams = await params;
   const supabase = await createClient();
-  const { data: event } = await supabase.from('events').select('title').eq('id', (await params).eventId).single() as any;
-  const { data: registrations } = await supabase.from('registrations').select('*, users(*)').eq('event_id', params.eventId) as unknown as { data: (Registration & { users: User })[] };
+  const { data: event } = await supabase.from('events').select('title').eq('id', resolvedParams.eventId).single() as any;
+  const { data: registrations } = await supabase.from('registrations').select('*, users(*)').eq('event_id', resolvedParams.eventId).eq('status', 'confirmed') as unknown as { data: (Registration & { users: User })[] };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Link href="/admin/events" passHref legacyBehavior>
+        <Link href="/admin/events">
           <Button variant="outline" size="icon">
             <ArrowLeft className="h-4 w-4" />
           </Button>
         </Link>
-        <h1 className="text-3xl font-bold tracking-tight">Registrations: {event?.title}</h1>
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Registrations: {event?.title}</h1>
+          <p className="text-muted-foreground mt-1">
+            {registrations?.length || 0} confirmed registration{registrations?.length !== 1 ? 's' : ''}
+          </p>
+        </div>
       </div>
 
       <div className="rounded-md border">
@@ -32,6 +39,7 @@ export default async function EventRegistrationsPage({ params }: { params: { eve
                 <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Status</th>
                 <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Checked In</th>
                 <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Registration Date</th>
+                <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground">Actions</th>
               </tr>
             </thead>
             <tbody className="[&_tr:last-child]:border-0">
@@ -46,11 +54,27 @@ export default async function EventRegistrationsPage({ params }: { params: { eve
                     <Badge variant={reg.checked_in ? 'default' : 'secondary'}>{reg.checked_in ? 'Yes' : 'No'}</Badge>
                   </td>
                   <td className="p-4 align-middle">{formatDate(reg.registered_at)}</td>
+                  <td className="p-4 align-middle">
+                    <div className="flex justify-end">
+                      <RegistrationActions
+                        registrationId={reg.id}
+                        eventId={resolvedParams.eventId}
+                        userId={reg.user_id}
+                        userName={reg.users?.name || 'Unknown'}
+                        eventTitle={event?.title || 'Unknown Event'}
+                      />
+                    </div>
+                  </td>
                 </tr>
               ))}
               {(!registrations || registrations.length === 0) && (
                 <tr>
-                  <td colSpan={5} className="p-4 text-center text-muted-foreground">No registrations found.</td>
+                  <td colSpan={6} className="p-8 text-center text-muted-foreground">
+                    <div className="flex flex-col items-center gap-2">
+                      <p className="font-medium">No registrations yet</p>
+                      <p className="text-sm">Students who register for this event will appear here.</p>
+                    </div>
+                  </td>
                 </tr>
               )}
             </tbody>

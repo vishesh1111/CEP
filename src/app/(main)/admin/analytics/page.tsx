@@ -21,7 +21,7 @@ export default async function AnalyticsPage() {
   const fillRate = totalSeats ? Math.round(((totalSeats - remainingSeats) / totalSeats) * 100) : 0;
 
   return (
-    <div className="space-y-6">
+    <div className="container mx-auto py-8 px-4 space-y-6 animate-fade-in-up">
       <h1 className="text-3xl font-bold tracking-tight">Analytics Dashboard</h1>
       
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

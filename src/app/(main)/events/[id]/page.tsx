@@ -56,7 +56,16 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
     .eq('event_id', event.id)
     .order('posted_at', { ascending: false }) as any;
 
-  const seatsPercentage = getSeatsPercentage(event.seats_remaining, event.total_seats);
+  // getSeatsPercentage returns FILL percentage (how much is taken)
+  const fillPercentage = getSeatsPercentage(event.seats_remaining, event.total_seats);
+  
+  // Color logic: >90% filled = red, >50% filled = amber, else green
+  let progressColor = 'bg-green-600';
+  if (fillPercentage > 90 || event.seats_remaining === 0) {
+    progressColor = 'bg-red-600';
+  } else if (fillPercentage > 50) {
+    progressColor = 'bg-amber-600';
+  }
   
   return (
     <div className="container mx-auto py-8 px-4 max-w-5xl">
@@ -147,13 +156,19 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
                 
                 <div className="flex items-start gap-3">
                   <Users className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                  <div>
+                  <div className="flex-1">
                     <div className="font-medium">Availability</div>
-                    <div className="text-sm text-muted-foreground flex items-center gap-2">
+                    <div className="text-sm text-muted-foreground flex items-center gap-2 mb-2">
                       <span>{event.seats_remaining} of {event.total_seats} seats</span>
-                      {seatsPercentage < 20 && event.seats_remaining > 0 && (
+                      {fillPercentage > 80 && event.seats_remaining > 0 && (
                         <Badge variant="destructive" className="h-5 text-[10px] uppercase">Filling Fast</Badge>
                       )}
+                    </div>
+                    <div className="relative flex h-2 w-full items-center overflow-hidden rounded-full bg-muted">
+                      <div 
+                        className={cn("h-full transition-all", progressColor)}
+                        style={{ width: `${fillPercentage}%` }}
+                      />
                     </div>
                   </div>
                 </div>
@@ -167,9 +182,12 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
                     You are registered for this event!
                   </div>
                   {registration.qr_code && (
-                    <div className="flex flex-col items-center justify-center p-4 bg-white rounded-lg border">
+                    <div className="flex flex-col items-center justify-center p-4 bg-white dark:bg-gray-900 rounded-lg border">
                       <QRCodeSVG value={registration.qr_code} size={150} />
-                      <p className="text-xs text-muted-foreground mt-3 text-center">
+                      <div className="mt-3 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded text-xs font-mono break-all text-center">
+                        {registration.qr_code}
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-2 text-center">
                         Show this QR code at the venue for check-in
                       </p>
                     </div>

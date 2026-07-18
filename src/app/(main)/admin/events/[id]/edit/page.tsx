@@ -3,9 +3,10 @@ import EventForm from '@/components/admin/event-form';
 import { updateEvent } from '@/lib/actions/events';
 import { notFound } from 'next/navigation';
 
-export default async function EditEventPage({ params }: { params: { id: string } }) {
+export default async function EditEventPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
   const supabase = await createClient();
-  const { data: event } = await supabase.from('events').select('*').eq('id', params.id).single();
+  const { data: event } = await supabase.from('events').select('*').eq('id', resolvedParams.id).single();
 
   if (!event) {
     notFound();
@@ -13,7 +14,7 @@ export default async function EditEventPage({ params }: { params: { id: string }
 
   const handleUpdate = async (formData: any) => {
     'use server';
-    return updateEvent(params.id, formData);
+    return updateEvent(resolvedParams.id, formData);
   };
 
   return (

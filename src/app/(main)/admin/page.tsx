@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { buttonVariants } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Users, CalendarDays, CheckCircle, Ticket, Plus, FileText, BarChart3, QrCode } from 'lucide-react';
+import { Users, CalendarDays, CheckCircle, Ticket, Plus, FileText, BarChart3, QrCode, UserPlus } from 'lucide-react';
 import { cn, formatDate } from '@/lib/utils';
 import type { Event } from '@/types/database';
 import type { Metadata } from 'next';
@@ -37,98 +37,176 @@ export default async function AdminDashboard() {
   const quickActions = [
     { href: '/admin/events/new', icon: Plus, label: 'Create Event', color: 'bg-primary/10 text-primary' },
     { href: '/admin/events', icon: CalendarDays, label: 'Manage Events', color: 'bg-blue-500/10 text-blue-500' },
+    { href: '/admin/invitations', icon: UserPlus, label: 'Invite Admin', color: 'bg-indigo-500/10 text-indigo-500' },
     { href: '/admin/announcements', icon: FileText, label: 'Announcements', color: 'bg-amber-500/10 text-amber-500' },
     { href: '/admin/check-in', icon: QrCode, label: 'QR Check-in', color: 'bg-green-500/10 text-green-500' },
     { href: '/admin/analytics', icon: BarChart3, label: 'Analytics', color: 'bg-purple-500/10 text-purple-500' },
   ];
 
   return (
-    <div className="container mx-auto py-8 px-4 space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>
-        <p className="text-muted-foreground mt-1">Manage events, registrations, and announcements.</p>
+    <div className="container mx-auto py-8 px-4 max-w-7xl space-y-8">
+      <style>{`
+        @keyframes fade-in-up {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        .animate-fade-in-up {
+          animation: fade-in-up 0.6s ease-out forwards;
+        }
+        
+        .delay-100 {
+          animation-delay: 0.1s;
+          opacity: 0;
+        }
+        
+        .delay-200 {
+          animation-delay: 0.2s;
+          opacity: 0;
+        }
+        
+        .delay-300 {
+          animation-delay: 0.3s;
+          opacity: 0;
+        }
+        
+        .delay-400 {
+          animation-delay: 0.4s;
+          opacity: 0;
+        }
+        
+        .delay-500 {
+          animation-delay: 0.5s;
+          opacity: 0;
+        }
+        
+        .glow-card {
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .glow-card:hover {
+          box-shadow: 0 10px 40px -10px rgba(var(--primary), 0.3);
+        }
+      `}</style>
+      
+      <div className="animate-fade-in-up">
+        <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+          Admin Dashboard
+        </h1>
+        <p className="text-muted-foreground mt-2 text-lg">Manage events, registrations, and announcements.</p>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Events</CardTitle>
-            <CalendarDays className="h-4 w-4 text-muted-foreground" />
+      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+        <Card className="animate-fade-in-up delay-100 glow-card border-border/50 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-sm font-semibold text-muted-foreground">Total Events</CardTitle>
+            <div className="p-2 rounded-lg bg-primary/10">
+              <CalendarDays className="h-5 w-5 text-primary" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{eventsCount || 0}</div>
+            <div className="text-3xl font-bold tracking-tight">{eventsCount || 0}</div>
+            <p className="text-xs text-muted-foreground mt-1">Campus-wide events</p>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Registrations</CardTitle>
-            <Ticket className="h-4 w-4 text-muted-foreground" />
+        
+        <Card className="animate-fade-in-up delay-200 glow-card border-border/50 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-sm font-semibold text-muted-foreground">Registrations</CardTitle>
+            <div className="p-2 rounded-lg bg-blue-500/10">
+              <Ticket className="h-5 w-5 text-blue-500" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{registrationsCount || 0}</div>
+            <div className="text-3xl font-bold tracking-tight">{registrationsCount || 0}</div>
+            <p className="text-xs text-muted-foreground mt-1">Total sign-ups</p>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Students</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+        
+        <Card className="animate-fade-in-up delay-300 glow-card border-border/50 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-sm font-semibold text-muted-foreground">Students</CardTitle>
+            <div className="p-2 rounded-lg bg-green-500/10">
+              <Users className="h-5 w-5 text-green-500" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{studentsCount || 0}</div>
+            <div className="text-3xl font-bold tracking-tight">{studentsCount || 0}</div>
+            <p className="text-xs text-muted-foreground mt-1">Active accounts</p>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Checked In</CardTitle>
-            <CheckCircle className="h-4 w-4 text-muted-foreground" />
+        
+        <Card className="animate-fade-in-up delay-400 glow-card border-border/50 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-sm font-semibold text-muted-foreground">Checked In</CardTitle>
+            <div className="p-2 rounded-lg bg-purple-500/10">
+              <CheckCircle className="h-5 w-5 text-purple-500" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{checkedInCount || 0}</div>
+            <div className="text-3xl font-bold tracking-tight">{checkedInCount || 0}</div>
+            <p className="text-xs text-muted-foreground mt-1">Attendance logged</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Quick Actions */}
-      <div>
-        <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-          {quickActions.map((action) => (
+      <div className="animate-fade-in-up delay-300">
+        <h2 className="text-2xl font-bold tracking-tight mb-6">Quick Actions</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+          {quickActions.map((action, index) => (
             <Link
               key={action.href}
               href={action.href}
               className={cn(
-                buttonVariants({ variant: 'outline' }),
-                'h-24 flex flex-col gap-2 rounded-xl hover:shadow-md transition-all'
+                'group h-28 flex flex-col items-center justify-center gap-3 rounded-xl border border-border/50 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60 hover:shadow-xl hover:scale-[1.03] hover:border-primary/50 transition-all duration-300',
+                `animate-fade-in-up delay-${(index + 2) * 100}`
               )}
             >
-              <div className={cn('p-2 rounded-lg', action.color)}>
-                <action.icon className="h-5 w-5" />
+              <div className={cn('p-3 rounded-xl transition-all duration-300 group-hover:scale-110', action.color)}>
+                <action.icon className="h-6 w-6" />
               </div>
-              <span className="text-xs font-medium">{action.label}</span>
+              <span className="text-sm font-semibold text-center px-2">{action.label}</span>
             </Link>
           ))}
         </div>
       </div>
 
       {/* Recent Registrations */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Registrations</CardTitle>
+      <Card className="animate-fade-in-up delay-500 glow-card border-border/50 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
+        <CardHeader className="border-b border-border/50 pb-4">
+          <CardTitle className="text-xl font-bold">Recent Registrations</CardTitle>
+          <p className="text-sm text-muted-foreground mt-1">Latest student sign-ups across all events</p>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {recentRegistrations?.map((reg: Record<string, unknown>) => {
+        <CardContent className="pt-6">
+          <div className="space-y-3">
+            {recentRegistrations?.map((reg: Record<string, unknown>, index: number) => {
               const users = reg.users as { name: string; email: string } | null;
               const events = reg.events as { title: string } | null;
               return (
-                <div key={reg.id as string} className="flex items-center justify-between border-b pb-3 last:border-0 last:pb-0">
-                  <div className="min-w-0 flex-1">
-                    <p className="font-medium text-sm truncate">{users?.name || 'Unknown'}</p>
-                    <p className="text-xs text-muted-foreground truncate">{events?.title || 'Unknown Event'}</p>
+                <div 
+                  key={reg.id as string} 
+                  className="flex items-center justify-between border-b border-border/30 pb-4 last:border-0 last:pb-0 transition-all hover:bg-accent/50 p-3 rounded-lg -mx-3"
+                >
+                  <div className="min-w-0 flex-1 space-y-1">
+                    <p className="font-semibold text-sm truncate">{users?.name || 'Unknown'}</p>
+                    <p className="text-xs text-muted-foreground truncate flex items-center gap-1.5">
+                      <CalendarDays className="h-3 w-3" />
+                      {events?.title || 'Unknown Event'}
+                    </p>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <Badge variant={reg.status === 'confirmed' ? 'default' : 'secondary'}>
+                  <div className="flex items-center gap-3 ml-4">
+                    <Badge 
+                      variant={reg.status === 'confirmed' ? 'default' : 'secondary'} 
+                      className="transition-transform hover:scale-105 font-medium"
+                    >
                       {reg.status as string}
                     </Badge>
                     <span className="text-xs text-muted-foreground whitespace-nowrap">
@@ -139,7 +217,11 @@ export default async function AdminDashboard() {
               );
             })}
             {(!recentRegistrations || recentRegistrations.length === 0) && (
-              <p className="text-sm text-muted-foreground text-center py-8">No recent registrations.</p>
+              <div className="text-center py-12">
+                <Users className="h-12 w-12 text-muted-foreground/30 mx-auto mb-3" />
+                <p className="text-sm font-medium text-muted-foreground">No recent registrations</p>
+                <p className="text-xs text-muted-foreground mt-1">New sign-ups will appear here</p>
+              </div>
             )}
           </div>
         </CardContent>

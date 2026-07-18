@@ -10,11 +10,11 @@ export default async function AdminEventsPage() {
   const { data: events } = await supabase.from('events').select('*').order('event_date', { ascending: false }) as { data: Event[] };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="container mx-auto py-8 px-4 space-y-6 animate-fade-in-up">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <h1 className="text-3xl font-bold tracking-tight">Events Management</h1>
-        <Link href="/admin/events/new" passHref legacyBehavior>
-          <Button>
+        <Link href="/admin/events/new" className="w-full sm:w-auto">
+          <Button className="w-full sm:w-auto">
             <Plus className="mr-2 h-4 w-4" />
             Create Event
           </Button>
@@ -41,13 +41,13 @@ export default async function AdminEventsPage() {
                   <td className="p-4 align-middle">{formatDate(event.event_date)}</td>
                   <td className="p-4 align-middle">{event.seats_remaining} / {event.total_seats}</td>
                   <td className="p-4 align-middle text-right flex justify-end gap-2">
-                    <Link href={`/admin/registrations/${event.id}`} passHref legacyBehavior>
+                    <Link href={`/admin/registrations/${event.id}`}>
                       <Button variant="outline" size="sm">
                         <Users className="h-4 w-4" />
                         <span className="sr-only">Registrations</span>
                       </Button>
                     </Link>
-                    <Link href={`/admin/events/${event.id}/edit`} passHref legacyBehavior>
+                    <Link href={`/admin/events/${event.id}/edit`}>
                       <Button variant="outline" size="sm">
                         <Edit className="h-4 w-4" />
                         <span className="sr-only">Edit</span>

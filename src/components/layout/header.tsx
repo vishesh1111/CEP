@@ -75,6 +75,7 @@ export function Header() {
 
   const navLinks = [
     { href: '/', label: 'Discover' },
+    { href: '/events', label: 'Events' },
     { href: '/events/calendar', label: 'Calendar' },
     { href: '#', label: 'Organizers' },
     { href: '#', label: 'About' },
@@ -88,7 +89,7 @@ export function Header() {
         <div className="container flex h-14 items-center justify-between mx-auto px-4 md:px-6">
           <div className="flex items-center gap-2">
             <Link href="/" className="flex items-center space-x-2 group">
-              <span className="font-bold inline-block text-[22px] tracking-tight text-blue-700 dark:text-blue-500">CampusPulse</span>
+              <span className="font-bold inline-block text-[22px] tracking-tight text-blue-700 dark:text-blue-500">CampusEvents</span>
             </Link>
           </div>
 
@@ -166,7 +167,7 @@ export function Header() {
               </SheetTrigger>
             <SheetContent side="right">
               <Link href="/" className="flex items-center space-x-2 mb-8 mt-4">
-                <span className="font-bold inline-block text-[22px] tracking-tight text-blue-700 dark:text-blue-500">CampusPulse</span>
+                <span className="font-bold inline-block text-[22px] tracking-tight text-blue-700 dark:text-blue-500">CampusEvents</span>
               </Link>
               <div className="flex flex-col gap-4">
                 {navLinks.map((link) => (

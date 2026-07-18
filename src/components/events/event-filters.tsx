@@ -44,6 +44,16 @@ export function EventFilters() {
     });
   };
 
+  const sortOptions = [
+    { value: 'date_asc', label: 'Date (Upcoming)' },
+    { value: 'date_desc', label: 'Date (Past First)' },
+    { value: 'seats_desc', label: 'Most Available' },
+    { value: 'seats_asc', label: 'Almost Full' },
+  ];
+
+  const currentSort = searchParams.get('sort') || 'date_asc';
+  const sortLabel = sortOptions.find(opt => opt.value === currentSort)?.label || 'Sort by';
+
   return (
     <div className="flex flex-col sm:flex-row gap-4 mb-8">
       <div className="relative flex-grow">
@@ -73,17 +83,16 @@ export function EventFilters() {
         </Select>
 
         <Select 
-          value={searchParams.get('sort') || 'date_asc'} 
+          value={currentSort} 
           onValueChange={(val) => val && handleSortChange(val)}
         >
           <SelectTrigger className="w-full sm:w-[180px] bg-background">
-            <SelectValue placeholder="Sort by" />
+            <span className="flex-1 text-left">{sortLabel}</span>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="date_asc">Date (Upcoming)</SelectItem>
-            <SelectItem value="date_desc">Date (Past First)</SelectItem>
-            <SelectItem value="seats_desc">Most Available</SelectItem>
-            <SelectItem value="seats_asc">Almost Full</SelectItem>
+            {sortOptions.map(opt => (
+              <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Calendar, MapPin, QrCode, Trash2, Loader2, AlertCircle } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { toast } from 'sonner';
@@ -61,38 +62,51 @@ export function RegistrationCard({ registration, isPast }: RegistrationCardProps
   return (
     <Card className="overflow-hidden hover:shadow-sm transition-shadow">
       <CardContent className="p-0">
-        <div className="flex flex-col sm:flex-row h-full">
-          <div className="p-5 flex-grow space-y-3">
-            <div>
-              <div className="flex items-start justify-between gap-2">
-                <Link href={`/events/${event.id}`} className="hover:underline">
-                  <h3 className="font-semibold text-lg line-clamp-1">{event.title}</h3>
-                </Link>
-                {registration.checked_in && (
-                  <Badge variant="secondary" className="bg-green-100 text-green-800 hover:bg-green-100 whitespace-nowrap">
-                    Checked In
-                  </Badge>
-                )}
-              </div>
-              <div className="text-xs text-muted-foreground mt-1">
-                Registered on {formatDate(registration.registered_at)}
-              </div>
+        <div className="flex flex-col h-full">
+          {/* Event Banner */}
+          {event.banner_url && (
+            <div className="relative h-32 w-full bg-muted">
+              <Image 
+                src={event.banner_url} 
+                alt={event.title} 
+                fill 
+                className="object-cover" 
+              />
             </div>
-            
-            <div className="space-y-1.5 text-sm">
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Calendar className="w-4 h-4 shrink-0" />
-                <span>{formatDate(event.event_date)}</span>
-              </div>
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <MapPin className="w-4 h-4 shrink-0" />
-                <span className="line-clamp-1">{event.venue}</span>
-              </div>
-            </div>
-          </div>
+          )}
           
-          {!isPast && (
-            <div className="bg-muted/30 border-t sm:border-t-0 sm:border-l p-4 flex sm:flex-col items-center justify-end sm:justify-center gap-2 sm:w-32 shrink-0">
+          <div className="flex flex-col sm:flex-row flex-grow">
+            <div className="p-5 flex-grow space-y-3">
+              <div>
+                <div className="flex items-start justify-between gap-2">
+                  <Link href={`/events/${event.id}`} className="hover:underline">
+                    <h3 className="font-semibold text-lg line-clamp-1">{event.title}</h3>
+                  </Link>
+                  {registration.checked_in && (
+                    <Badge variant="secondary" className="bg-green-100 text-green-800 hover:bg-green-100 whitespace-nowrap">
+                      Checked In
+                    </Badge>
+                  )}
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  Registered on {formatDate(registration.registered_at)}
+                </div>
+              </div>
+            
+              <div className="space-y-1.5 text-sm">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Calendar className="w-4 h-4 shrink-0" />
+                  <span>{formatDate(event.event_date)}</span>
+                </div>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <MapPin className="w-4 h-4 shrink-0" />
+                  <span className="line-clamp-1">{event.venue}</span>
+                </div>
+              </div>
+            </div>
+          
+            {!isPast && (
+              <div className="bg-muted/30 border-t sm:border-t-0 sm:border-l p-4 flex sm:flex-col items-center justify-end sm:justify-center gap-2 sm:w-32 shrink-0">
               {registration.qr_code && (
                 <Dialog open={qrOpen} onOpenChange={setQrOpen}>
                   <DialogTrigger className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), "w-full cursor-pointer")}>
@@ -110,6 +124,10 @@ export function RegistrationCard({ registration, isPast }: RegistrationCardProps
                       <QRCodeSVG value={registration.qr_code} size={200} />
                       <div className="mt-4 font-semibold text-center text-black">{event.title}</div>
                       <div className="text-sm text-gray-500 mt-1">{formatDate(event.event_date)}</div>
+                      <div className="mt-3 px-3 py-2 bg-gray-100 rounded text-xs font-mono text-black break-all">
+                        {registration.qr_code}
+                      </div>
+                      <p className="text-xs text-gray-500 mt-2 text-center">Scan QR code or enter code above manually</p>
                     </div>
                   </DialogContent>
                 </Dialog>
@@ -145,6 +163,7 @@ export function RegistrationCard({ registration, isPast }: RegistrationCardProps
               </AlertDialog>
             </div>
           )}
+          </div>
         </div>
       </CardContent>
     </Card>

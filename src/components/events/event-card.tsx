@@ -19,10 +19,20 @@ interface EventCardProps {
 export function EventCard({ event, userRegistration, index = 0 }: EventCardProps) {
   const router = useRouter();
   
-  const seatsPercentage = getSeatsPercentage(event.seats_remaining, event.total_seats);
+  // getSeatsPercentage returns FILL percentage (how much is taken)
+  const fillPercentage = getSeatsPercentage(event.seats_remaining, event.total_seats);
+  
+  // Color logic: >90% filled = red, >50% filled = amber, else green
   let seatsColor = 'text-green-600';
-  if (seatsPercentage < 10 || event.seats_remaining === 0) seatsColor = 'text-red-600';
-  else if (seatsPercentage < 50) seatsColor = 'text-amber-600';
+  let progressColor = 'bg-green-600';
+  
+  if (fillPercentage > 90 || event.seats_remaining === 0) {
+    seatsColor = 'text-red-600';
+    progressColor = 'bg-red-600';
+  } else if (fillPercentage > 50) {
+    seatsColor = 'text-amber-600';
+    progressColor = 'bg-amber-600';
+  }
 
   return (
     <motion.div
@@ -77,6 +87,14 @@ export function EventCard({ event, userRegistration, index = 0 }: EventCardProps
             <span className={cn("font-medium", seatsColor)}>
               {event.seats_remaining} / {event.total_seats} seats left
             </span>
+          </div>
+          <div className="mt-2">
+            <div className="relative flex h-1.5 w-full items-center overflow-hidden rounded-full bg-muted">
+              <div 
+                className={cn("h-full transition-all", progressColor)}
+                style={{ width: `${fillPercentage}%` }}
+              />
+            </div>
           </div>
         </div>
       </CardContent>

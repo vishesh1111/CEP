@@ -404,7 +404,11 @@
 }
 
 .rbc-off-range-bg {
-  @apply bg-muted/30;
+  background: transparent !important;
+}
+
+.rbc-date-cell.rbc-off-range {
+  visibility: hidden !important;
 }
 
 .rbc-today {

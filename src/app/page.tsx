@@ -6,6 +6,7 @@ import { CalendarDays, Users, Sparkles, ArrowRight, Zap, Trophy, GraduationCap, 
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { ShaderBackground } from '@/components/ui/shader-background';
+import { AnimatedCounter } from '@/components/ui/animated-counter';
 
 export default function Home() {
   return (
@@ -140,9 +141,9 @@ export default function Home() {
         <div className="container mx-auto px-4 md:px-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {[
-              { icon: CalendarDays, stat: '150+', label: 'Total Events', color: 'from-indigo-500 to-violet-600' },
-              { icon: Users, stat: '5,000+', label: 'Active Students', color: 'from-violet-500 to-purple-600' },
-              { icon: Sparkles, stat: '7', label: 'Categories', color: 'from-purple-500 to-pink-600' },
+              { icon: CalendarDays, value: 150, suffix: '+', label: 'Total Events', color: 'from-indigo-500 to-violet-600' },
+              { icon: Users, value: 5000, suffix: '+', label: 'Active Students', color: 'from-violet-500 to-purple-600' },
+              { icon: Sparkles, value: 7, suffix: '', label: 'Categories', color: 'from-purple-500 to-pink-600' },
             ].map((item, i) => (
               <motion.div
                 key={item.label}
@@ -158,7 +159,9 @@ export default function Home() {
                 <div className={cn('p-3 rounded-xl bg-gradient-to-br shadow-lg', item.color)}>
                   <item.icon className="h-7 w-7 text-white" />
                 </div>
-                <h3 className="text-3xl font-bold tracking-tight">{item.stat}</h3>
+                <h3 className="text-3xl font-bold tracking-tight">
+                  <AnimatedCounter to={item.value} suffix={item.suffix} duration={2500} />
+                </h3>
                 <p className="text-muted-foreground font-medium text-sm">{item.label}</p>
               </motion.div>
             ))}
