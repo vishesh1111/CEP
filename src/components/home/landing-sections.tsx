@@ -16,9 +16,9 @@ export function LandingHero() {
       <section className="relative w-full py-28 md:py-36 lg:py-48 overflow-hidden">
 
         {/* Mesh overlay blobs */}
-        <div className="absolute top-[10%] left-[15%] w-[600px] h-[600px] bg-indigo-400/20 dark:bg-white/[0.07] rounded-full blur-[100px] animate-pulse" />
-        <div className="absolute bottom-[5%] right-[10%] w-[500px] h-[500px] bg-sky-300/30 dark:bg-pink-400/[0.1] rounded-full blur-[100px] float" />
-        <div className="absolute top-[50%] left-[60%] w-[300px] h-[300px] bg-purple-300/20 dark:bg-indigo-300/[0.08] rounded-full blur-[80px] float" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-[10%] left-[-10%] md:left-[15%] w-[300px] h-[300px] md:w-[600px] md:h-[600px] bg-indigo-400/30 dark:bg-white/[0.07] rounded-full blur-[60px] md:blur-[100px] animate-pulse" />
+        <div className="absolute bottom-[5%] right-[-10%] md:right-[10%] w-[250px] h-[250px] md:w-[500px] md:h-[500px] bg-sky-300/40 dark:bg-pink-400/[0.1] rounded-full blur-[60px] md:blur-[100px] float" />
+        <div className="absolute top-[50%] left-[30%] md:left-[60%] w-[200px] h-[200px] md:w-[300px] md:h-[300px] bg-purple-300/30 dark:bg-indigo-300/[0.08] rounded-full blur-[50px] md:blur-[80px] float" style={{ animationDelay: '2s' }} />
 
         {/* Noise texture */}
         <div className="absolute inset-0 noise-overlay pointer-events-none opacity-50 dark:opacity-100" />

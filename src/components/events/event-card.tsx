@@ -10,6 +10,7 @@ import { cn, formatDate, isDeadlinePassed, getSeatsPercentage } from '@/lib/util
 import { motion } from 'framer-motion';
 import { RegisterButton } from './register-button';
 import { ShareButton } from './share-button';
+import { useTransition } from 'react';
 
 interface EventCardProps {
   event: Event;
@@ -20,6 +21,7 @@ interface EventCardProps {
 
 export function EventCard({ event, userRegistration, waitlistCount = 0, index = 0 }: EventCardProps) {
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
   
   // getSeatsPercentage returns FILL percentage (how much is taken)
   const fillPercentage = getSeatsPercentage(event.seats_remaining, event.total_seats);
@@ -46,8 +48,11 @@ export function EventCard({ event, userRegistration, waitlistCount = 0, index = 
       className="h-full"
     >
       <Card 
-        className="group overflow-hidden flex flex-col h-full cursor-pointer transition-shadow hover:shadow-xl border-border/50"
-        onClick={() => router.push(`/events/${event.id}`)}
+        className={cn(
+          "group overflow-hidden flex flex-col h-full cursor-pointer transition-all hover:shadow-xl border-border/50 active:scale-[0.98]",
+          isPending && "opacity-70 pointer-events-none"
+        )}
+        onClick={() => startTransition(() => router.push(`/events/${event.id}`))}
       >
       <div className="relative h-48 w-full bg-muted">
         {event.banner_url ? (

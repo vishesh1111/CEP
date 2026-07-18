@@ -411,7 +411,7 @@ export default function CalendarPage() {
       </div>
 
       <div
-        className={`relative border rounded-lg p-6 bg-card z-0 transition-all duration-300 ${!isDark ? 'calendar-card-light' : ''}`}
+        className={`relative border rounded-lg p-6 bg-card z-0 transition-all duration-300 overflow-x-auto ${!isDark ? 'calendar-card-light' : ''}`}
         style={{ minHeight: '750px' }}
       >
         {isMounted && isDark && (
@@ -434,30 +434,32 @@ export default function CalendarPage() {
             />
           </div>
         )}
-        <Calendar
-          localizer={localizer}
-          events={events}
-          startAccessor="start"
-          endAccessor="end"
-          style={{ height: 700 }}
-          onSelectEvent={handleSelectEvent}
-          view={view}
-          onView={setView}
-          date={date}
-          onNavigate={setDate}
-          views={['month', 'week', 'day', 'agenda']}
-          defaultView="month"
-          step={30}
-          timeslots={2}
-          min={new Date(2024, 0, 1, 7, 0, 0)}
-          max={new Date(2024, 0, 1, 22, 0, 0)}
-          showMultiDayTimes
-          popup
-          eventPropGetter={eventStyleGetter}
-          components={{
-            event: EventComponent
-          }}
-        />
+        <div className="min-w-[700px]">
+          <Calendar
+            localizer={localizer}
+            events={events}
+            startAccessor="start"
+            endAccessor="end"
+            style={{ height: 700 }}
+            onSelectEvent={handleSelectEvent}
+            view={view}
+            onView={setView}
+            date={date}
+            onNavigate={setDate}
+            views={['month', 'week', 'day', 'agenda']}
+            defaultView="month"
+            step={30}
+            timeslots={2}
+            min={new Date(2024, 0, 1, 7, 0, 0)}
+            max={new Date(2024, 0, 1, 22, 0, 0)}
+            showMultiDayTimes
+            popup
+            eventPropGetter={eventStyleGetter}
+            components={{
+              event: EventComponent
+            }}
+          />
+        </div>
       </div>
     </div>
   );

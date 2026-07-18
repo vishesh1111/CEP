@@ -19,6 +19,7 @@ export function Header() {
   const [role, setRole] = React.useState<string | null>(null);
   const [userName, setUserName] = React.useState<string>('');
   const [hoveredPath, setHoveredPath] = React.useState<string | null>(null);
+  const [isLoading, setIsLoading] = React.useState(true);
   
   const router = useRouter();
   const pathname = usePathname();
@@ -40,6 +41,7 @@ export function Header() {
           setRole(profile.role);
         }
       }
+      setIsLoading(false);
     }
     getUser();
 
@@ -61,6 +63,7 @@ export function Header() {
         setRole(null);
         setUserName('');
       }
+      setIsLoading(false);
     });
 
     return () => {
@@ -134,7 +137,9 @@ export function Header() {
             <ThemeToggle />
 
             <div className="hidden md:flex items-center gap-3">
-              {user ? (
+              {isLoading ? (
+                <div className="h-9 w-9 rounded-full bg-muted animate-pulse" />
+              ) : user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger className="relative h-9 w-9 rounded-full outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 transition-transform hover:scale-105 duration-200 border-2 border-transparent hover:border-blue-500/20">
                     <Avatar className="h-full w-full border border-border/50">
@@ -211,7 +216,12 @@ export function Header() {
                     {link.label}
                   </Link>
                 ))}
-                {!user && (
+                {isLoading ? (
+                  <div className="flex flex-col gap-3 mt-6">
+                    <div className="w-full h-12 bg-muted animate-pulse rounded-xl" />
+                    <div className="w-full h-12 bg-muted animate-pulse rounded-xl" />
+                  </div>
+                ) : !user ? (
                   <div className="flex flex-col gap-3 mt-6">
                     <Link href="/login" className={cn(buttonVariants({ variant: 'outline' }), 'w-full justify-center rounded-xl py-6')}>
                       Sign In
@@ -220,8 +230,7 @@ export function Header() {
                       Get Started
                     </Link>
                   </div>
-                )}
-                {user && (
+                ) : (
                   <div className="flex flex-col gap-2 mt-6 pt-6 border-t border-border/50">
                     <Link href="/profile" className="text-sm font-medium px-4 py-3 rounded-xl hover:bg-muted/50 transition-colors">Profile</Link>
                     <button onClick={handleLogout} className="text-sm font-medium text-left px-4 py-3 rounded-xl hover:bg-destructive/10 text-destructive transition-colors">
