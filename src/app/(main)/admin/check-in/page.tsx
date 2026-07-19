@@ -356,7 +356,15 @@ export default function CheckInPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="p-4 border rounded-lg bg-muted/30">
-                <QrScanner onScan={handleScan} />
+                <QrScanner 
+                  onScan={handleScan}
+                  onScanSuccess={() => {
+                    console.log('📷 Camera stopped after successful scan');
+                    toast.info('Camera stopped. Click "Start Camera" to scan another person.', {
+                      duration: 3000,
+                    });
+                  }}
+                />
               </div>
 
               {/* Drag and Drop Zone */}

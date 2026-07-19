@@ -7,9 +7,10 @@ import { toast } from 'sonner';
 
 interface QrScannerProps {
   onScan: (text: string) => void;
+  onScanSuccess?: () => void; // Callback after successful scan
 }
 
-export default function QrScannerJsQR({ onScan }: QrScannerProps) {
+export default function QrScannerJsQR({ onScan, onScanSuccess }: QrScannerProps) {
   const [isScanning, setIsScanning] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -80,9 +81,19 @@ export default function QrScannerJsQR({ onScan }: QrScannerProps) {
         navigator.vibrate(200);
       }
 
+      // Stop scanning after successful detection
+      stopScanning();
+
       // Process scan
       console.log('✅ Processing scan:', code.data);
       onScan(code.data);
+      
+      // Notify parent that scan was successful
+      if (onScanSuccess) {
+        onScanSuccess();
+      }
+      
+      return; // Don't continue scanning after successful scan
     }
 
     // Continue scanning
