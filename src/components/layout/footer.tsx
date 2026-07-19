@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { CalendarDays, Mail } from 'lucide-react';
+import { CalendarDays } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 
 export function Footer() {
@@ -40,10 +40,15 @@ export function Footer() {
           <div className="space-y-3">
             <h4 className="font-semibold text-sm">Contact</h4>
             <div className="flex flex-col space-y-2">
-              <a href="mailto:events@campus.edu" className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2">
-                <Mail className="h-3.5 w-3.5" />
-                events@campus.edu
-              </a>
+              <Link href="/about" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                About Us
+              </Link>
+              <Link href="/admin" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                Admin Panel
+              </Link>
+              <Link href="/profile" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                My Profile
+              </Link>
             </div>
           </div>
         </div>

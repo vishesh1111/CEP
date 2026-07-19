@@ -541,9 +541,23 @@ export default function CalendarPage() {
           -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
           -webkit-mask-composite: xor;
           mask-composite: exclude;
+        /* Light Mode Gradient Border */
+        .calendar-card-light::before {
+          content: '';
+          position: absolute;
+          inset: -4px;
+          border-radius: inherit;
+          padding: 4px;
+          background: linear-gradient(120deg, #6366f1, #a855f7, #6366f1);
+          background-size: 200% 200%;
+          animation: borderFlow 6s ease infinite;
+          -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          -webkit-mask-composite: xor;
+          mask-composite: exclude;
           pointer-events: none;
           z-index: -1;
         }
+
         @keyframes borderFlow {
           0%, 100% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }
@@ -574,7 +588,7 @@ export default function CalendarPage() {
           className={`relative rounded-xl z-0 transition-all duration-300 ${!isDark ? 'calendar-card-light' : ''}`}
         >
           {isDark && (
-            <div className="absolute -inset-4 -z-10 pointer-events-none rounded-xl">
+            <div className="absolute -inset-[1px] -z-10 pointer-events-none rounded-xl overflow-hidden">
               <PulsingBorder
                 colors={['#6366f1']}
                 colorBack="#ffffff00"
@@ -593,7 +607,7 @@ export default function CalendarPage() {
               />
             </div>
           )}
-          <div className="border rounded-xl p-4 bg-card">
+          <div className="border rounded-xl p-4 bg-card relative z-10">
             <MobileCalendarView
               events={events}
               currentDate={date}
@@ -606,10 +620,10 @@ export default function CalendarPage() {
       {/* Desktop Calendar View */}
       {isMounted && !isMobile && (
         <div
-          className={`relative rounded-lg z-0 transition-all duration-300 ${!isDark ? 'calendar-card-light' : ''}`}
+          className={`relative rounded-xl transition-all duration-300 ${!isDark ? 'calendar-card-light' : ''}`}
         >
           {isDark && (
-            <div className="absolute -inset-4 -z-10 pointer-events-none rounded-lg">
+            <div className="absolute -inset-[1px] -z-10 pointer-events-none rounded-xl overflow-hidden">
               <PulsingBorder
                 colors={['#6366f1']}
                 colorBack="#ffffff00"
@@ -629,7 +643,7 @@ export default function CalendarPage() {
             </div>
           )}
           <div 
-            className="border rounded-lg p-6 bg-card overflow-x-auto" 
+            className="border rounded-xl p-6 bg-card overflow-x-auto relative z-10" 
             style={{ minHeight: '750px' }}
           >
             <div className="min-w-[700px]">

@@ -17,21 +17,25 @@ export async function checkInRegistration(qrCode: string) {
     .select('*')
     .eq('qr_code', normalizedCode)
     .eq('status', 'confirmed')
-    .eq('checked_in', false)
     .single();
 
   if (findError || !registration) {
-    return { error: 'Invalid QR code, already checked in, or registration not confirmed' };
+    return { error: 'Invalid QR code or registration not confirmed' };
   }
 
-  // Update the registration to checked in
-  const { error: updateError } = await supabase
-    .from('registrations')
-    .update({ checked_in: true })
-    .eq('id', registration.id);
+  // Check if already checked in
+  const isAlreadyCheckedIn = registration.checked_in;
 
-  if (updateError) {
-    return { error: updateError.message };
+  // If not already checked in, update the registration
+  if (!isAlreadyCheckedIn) {
+    const { error: updateError } = await supabase
+      .from('registrations')
+      .update({ checked_in: true })
+      .eq('id', registration.id);
+
+    if (updateError) {
+      return { error: updateError.message };
+    }
   }
 
   // Fetch full registration details with user and event info
@@ -72,5 +76,10 @@ export async function checkInRegistration(qrCode: string) {
   };
   
   revalidatePath('/admin/check-in');
-  return { data: transformedData };
+  
+  // Return with a flag indicating if they were already checked in
+  return { 
+    data: transformedData,
+    alreadyCheckedIn: isAlreadyCheckedIn 
+  };
 }

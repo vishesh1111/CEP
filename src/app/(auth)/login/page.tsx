@@ -19,6 +19,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { signIn } from '@/lib/actions/auth';
 import { motion } from 'framer-motion';
@@ -111,7 +112,7 @@ function LoginForm() {
                       </Link>
                     </div>
                     <FormControl>
-                      <Input placeholder="••••••••" type="password" disabled={isPending} {...field} />
+                      <PasswordInput placeholder="••••••••" disabled={isPending} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

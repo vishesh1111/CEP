@@ -41,14 +41,34 @@ export default function CheckInPage() {
   const [isDragging, setIsDragging] = useState(false);
 
   const handleScan = async (code: string) => {
+    if (loading) return; // Prevent concurrent scans
+    
     setLoading(true);
     // Convert to uppercase for consistency
     const upperCode = code.trim().toUpperCase();
+    
+    // Show processing toast
+    const toastId = toast.loading(`Checking in ${upperCode}...`);
+    
     const res = await checkInRegistration(upperCode);
+    toast.dismiss(toastId);
+    
     if (res?.error) {
       toast.error(res.error);
     } else {
-      toast.success('Successfully checked in!');
+      // Check if already checked in
+      if (res?.alreadyCheckedIn) {
+        toast.info('✓ Already checked in', {
+          description: res?.data?.user?.name || 'This participant was already checked in',
+          duration: 3000,
+        });
+      } else {
+        toast.success('✅ Successfully checked in!', {
+          description: res?.data?.user?.name || 'Participant checked in',
+          duration: 3000,
+        });
+      }
+      
       if (res?.data) {
         console.log('Check-in data received:', res.data);
         setLastCheckIn(res.data);

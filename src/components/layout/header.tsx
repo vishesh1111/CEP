@@ -50,18 +50,29 @@ export function Header() {
       } catch {
         // Role fetch failed, that's okay
       }
+      if (isMounted) setIsLoading(false);
     }
 
     async function initAuth() {
       try {
+        // First check session from storage
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          await fetchUserAndRole(session.user);
+          return;
+        }
+        
+        // Fallback to getUser if no session
         const { data: { user: authUser } } = await supabase.auth.getUser();
         if (authUser) {
           await fetchUserAndRole(authUser);
+        } else {
+          if (isMounted) setIsLoading(false);
         }
       } catch {
         // Auth check failed
+        if (isMounted) setIsLoading(false);
       }
-      if (isMounted) setIsLoading(false);
     }
 
     initAuth();
@@ -74,9 +85,9 @@ export function Header() {
           setUser(null);
           setRole(null);
           setUserName('');
+          setIsLoading(false);
         }
       }
-      if (isMounted) setIsLoading(false);
     });
 
     return () => {
@@ -103,7 +114,7 @@ export function Header() {
   ];
 
   return (
-    <div className="fixed top-0 inset-x-0 z-50 pointer-events-none">
+    <div className="fixed top-0 inset-x-0 z-[100] pointer-events-none">
       <header className="w-full border-b border-border/40 bg-background/80 backdrop-blur-2xl supports-[backdrop-filter]:bg-background/60 pointer-events-auto transition-all duration-300">
         <div className="max-w-7xl mx-auto flex h-16 items-center justify-between px-4 md:px-8">
           <div className="flex items-center gap-2">

@@ -9,12 +9,12 @@ import { EventCompletionButton } from '@/components/admin/event-completion-butto
 export default async function AdminEventsPage() {
   const supabase = await createClient();
   
-  // Fetch events with registration stats
+  // Fetch events with registration stats (using left join to include events without registrations)
   const { data: eventsData } = await supabase
     .from('events')
     .select(`
       *,
-      registrations!inner(
+      registrations(
         status,
         checked_in
       )

@@ -29,6 +29,7 @@ export async function createEvent(formData: {
   if (error) return { error: error.message };
   revalidatePath('/events');
   revalidatePath('/admin');
+  revalidatePath('/admin/events');
   return { data };
 }
 
@@ -61,6 +62,7 @@ export async function updateEvent(eventId: string, formData: Partial<{
   if (error) return { error: error.message };
   revalidatePath('/events');
   revalidatePath('/admin');
+  revalidatePath('/admin/events');
   revalidatePath(`/events/${eventId}`);
   revalidatePath(`/admin/events/${eventId}/edit`);
   return { data };
@@ -76,5 +78,6 @@ export async function deleteEvent(eventId: string) {
   if (error) return { error: error.message };
   revalidatePath('/events');
   revalidatePath('/admin');
+  revalidatePath('/admin/events');
   return { success: true };
 }
