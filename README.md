@@ -14,7 +14,8 @@ Try it immediately with these demo accounts:
 
 | Role | Email | Password |
 |------|-------|----------|
-| **Admin** | `[test@example.com]` | `[password123]` |
+| **Admin** | `test@example.com` | `password123` |
+| **Student** | `student@gmail.com` | `password123` |
 
 > Log in as **Admin** to see the full event-management, analytics, and check-in tooling. Log in as **Student** to see registration, QR tickets, certificates, and the waitlist flow.
 
