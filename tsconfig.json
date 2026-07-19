@@ -19,7 +19,8 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@shadergradient/react": ["./node_modules/@shadergradient/react/dist/index.mjs"]
     }
   },
   "include": [

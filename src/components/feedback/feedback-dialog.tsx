@@ -22,13 +22,6 @@ export function FeedbackDialog({ eventId, eventTitle }: FeedbackDialogProps) {
   const [loading, setLoading] = useState(false);
   const [existingFeedback, setExistingFeedback] = useState<any>(null);
 
-  // Load existing feedback when dialog opens
-  useEffect(() => {
-    if (open) {
-      loadExistingFeedback();
-    }
-  }, [open]);
-
   const loadExistingFeedback = async () => {
     const result = await getFeedbackByUser(eventId);
     if (result.data) {
@@ -37,6 +30,13 @@ export function FeedbackDialog({ eventId, eventTitle }: FeedbackDialogProps) {
       setComment((result.data as any).comment || '');
     }
   };
+
+  // Load existing feedback when dialog opens
+  useEffect(() => {
+    if (open) {
+      loadExistingFeedback();
+    }
+  }, [open]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
