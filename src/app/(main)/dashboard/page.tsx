@@ -102,12 +102,12 @@ export default async function DashboardPage() {
       </div>
 
       <Tabs defaultValue="events" className="w-full">
-        <TabsList className="mb-6 w-full sm:w-auto flex flex-col sm:flex-row h-auto p-1">
-          <TabsTrigger value="events" className="py-2.5 px-6 flex items-center gap-2 w-full sm:w-auto">
+        <TabsList className="mb-6 w-full sm:w-auto grid grid-cols-2 sm:flex sm:flex-row h-auto p-1 gap-1">
+          <TabsTrigger value="events" className="py-2.5 px-4 sm:px-6 flex items-center justify-center gap-2">
             <Calendar className="w-4 h-4" />
             My Events
           </TabsTrigger>
-          <TabsTrigger value="announcements" className="py-2.5 px-6 flex items-center gap-2 w-full sm:w-auto">
+          <TabsTrigger value="announcements" className="py-2.5 px-4 sm:px-6 flex items-center justify-center gap-2">
             <Bell className="w-4 h-4" />
             Announcements
           </TabsTrigger>

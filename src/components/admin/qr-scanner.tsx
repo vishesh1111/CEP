@@ -50,12 +50,17 @@ export default function QrScanner({ onScan }: QrScannerProps) {
     setIsLoading(true);
 
     try {
+      // Detect if we're on mobile
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      
       const config: Html5QrcodeCameraScanConfig = {
-        fps: 10,
+        fps: isMobile ? 5 : 10, // Lower FPS on mobile for better performance
         qrbox: function(viewfinderWidth, viewfinderHeight) {
-          // Use 70% of the smallest dimension
+          // More aggressive sizing for mobile
           const minEdgeSize = Math.min(viewfinderWidth, viewfinderHeight);
-          const qrboxSize = Math.floor(minEdgeSize * 0.7);
+          const qrboxSize = isMobile 
+            ? Math.floor(minEdgeSize * 0.85) // Larger box on mobile (85%)
+            : Math.floor(minEdgeSize * 0.7);  // 70% on desktop
           return {
             width: qrboxSize,
             height: qrboxSize
@@ -64,12 +69,19 @@ export default function QrScanner({ onScan }: QrScannerProps) {
         aspectRatio: 1.0,
         disableFlip: false,
         videoConstraints: {
-          facingMode: { ideal: 'environment' }
+          facingMode: { ideal: 'environment' },
+          // Add mobile-specific video constraints
+          ...(isMobile && {
+            width: { ideal: 1920 },
+            height: { ideal: 1080 },
+            focusMode: { ideal: 'continuous' }
+          })
         }
       };
 
       const cameraIdToUse = cameraId || cameras[currentCameraIndex]?.id || { facingMode: 'environment' };
 
+      console.log('Device type:', isMobile ? 'Mobile' : 'Desktop');
       console.log('Starting scanner with config:', config);
       console.log('Camera ID:', cameraIdToUse);
 
@@ -154,7 +166,7 @@ export default function QrScanner({ onScan }: QrScannerProps) {
   return (
     <div className="space-y-4">
       {/* Scanner Display */}
-      <div className="relative rounded-lg overflow-hidden bg-black/5">
+      <div className="relative rounded-lg overflow-hidden bg-black/5 min-h-[300px]">
         <div id="qr-reader" className="w-full" />
         
         {/* Overlay when not scanning */}
@@ -164,6 +176,19 @@ export default function QrScanner({ onScan }: QrScannerProps) {
               <Camera className="h-12 w-12 text-muted-foreground mx-auto" />
               <p className="text-sm text-muted-foreground">Camera ready to scan</p>
             </div>
+          </div>
+        )}
+        
+        {/* Mobile scanning instructions */}
+        {isScanning && (
+          <div className="absolute bottom-4 left-4 right-4 bg-black/70 text-white text-xs p-3 rounded-lg backdrop-blur-sm md:hidden">
+            <p className="font-medium mb-1">📱 Mobile Scanning Tips:</p>
+            <ul className="space-y-1">
+              <li>• Hold QR code 20-40cm from camera</li>
+              <li>• Keep it centered in the green box</li>
+              <li>• Ensure good lighting</li>
+              <li>• Hold steady for 2-3 seconds</li>
+            </ul>
           </div>
         )}
       </div>
