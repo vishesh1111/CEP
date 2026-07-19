@@ -7,7 +7,7 @@ A comprehensive full-stack web application for managing college events, student 
 | Resource | Link |
 |----------|------|
 | **🚀 Live Application** | [https://event-portal-eu.vercel.app/](https://event-portal-eu.vercel.app/) |
-| **🎥 Demo Video** | *[Coming Soon - Will be added]* |
+| **🎥 Demo Video** | *[https://drive.google.com/file/d/1_hdB6Cz8muhEcQbK4c56fOMSMshSAPRe/view?usp=sharing]* |
 
 
 Try it immediately with these demo accounts:
