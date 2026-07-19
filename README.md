@@ -387,49 +387,5 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_production_key
 NEXT_PUBLIC_APP_URL=https://your-domain.com
 ```
 
----
 
-## 🤝 Contributing
-
-This project was developed for internship and hackathon purposes. For any queries or suggestions, please contact the developer.
-
----
-
-## 📝 License
-
-This project is part of an academic/internship portfolio.
-
----
-
-## 👨‍💻 Developer
-
-**[Your Name]**
-- Email: [your-email@example.com]
-- LinkedIn: [Your LinkedIn]
-- GitHub: [Your GitHub]
-
----
-
-## 🙏 Acknowledgments
-
-- Next.js team for the amazing framework
-- Supabase for the backend infrastructure
-- Shadcn for the beautiful UI components
-- The open-source community
-
----
-
-## 📊 Project Statistics
-
-- **Lines of Code:** 10,000+
-- **Components:** 50+
-- **Database Tables:** 6
-- **API Endpoints:** 10+
-- **Features:** 40+
-
----
-
-**⭐ If you find this project useful, please consider giving it a star!**
-
----
 
