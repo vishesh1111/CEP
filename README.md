@@ -1,183 +1,435 @@
-# CampusEvents — College Event Management Portal
+# 🎓 Campus Events Management Platform
 
-A full-stack event management portal for college campuses, built with Next.js, Supabase, and modern UI technologies.
+A comprehensive full-stack web application for managing college events, student registrations, and event check-ins with QR code technology.
 
-![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)
-![Supabase](https://img.shields.io/badge/Supabase-Postgres-green?logo=supabase)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-06B6D4?logo=tailwindcss)
+## 🌐 Live Demo & Video
 
-## 🚀 Features
+| Resource | Link |
+|----------|------|
+| **🚀 Live Application** | [https://event-portal-eu.vercel.app/](https://event-portal-eu.vercel.app/) |
+| **🎥 Demo Video** | *[Coming Soon - Will be added]* |
 
-### Core Features
-- **Authentication** — Email/password registration & login via Supabase Auth with protected routes
-- **Event Discovery** — Browse, search, filter, and sort campus events with paginated grid
-- **Student Dashboard** — View registered events, manage registrations, view announcements
-- **Admin Panel** — Full CRUD for events, manage registrations, publish announcements
-- **Responsive Design** — Mobile-first layout that works on all screen sizes
+[![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)](https://www.typescriptlang.org/)
+[![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-green)](https://supabase.com/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-38B2AC)](https://tailwindcss.com/)
+[![Vercel](https://img.shields.io/badge/Deployed-Vercel-black)](https://vercel.com/)
 
-### Bonus Features
-- **QR Code Registration** — Auto-generated QR codes for confirmed registrations
-- **Admin QR Check-in** — Scan QR codes or enter manually to check in students
-- **Email Confirmations** — Registration/cancellation emails via Resend
-- **Dark Mode** — System-aware dark/light theme toggle with next-themes
-- **User Profiles** — Edit name, upload avatar, view registration history
-- **Analytics Dashboard** — Recharts visualizations for events, registrations, categories
-- **Calendar View** — react-big-calendar for date-based event browsing
-- **Loading Skeletons** — Skeleton components during data fetching
-- **Docker Deployment** — Multi-stage Dockerfile with standalone Next.js output
+---
 
-## 🛠 Tech Stack
+## 📋 Table of Contents
 
-| Layer | Technology |
-|-------|-----------|
-| Frontend | Next.js 16 (App Router), TypeScript, Tailwind CSS v4 |
-| UI Components | shadcn/ui |
-| Backend | Next.js Server Actions & Route Handlers |
-| Database | Supabase (PostgreSQL) |
-| Authentication | Supabase Auth |
-| Storage | Supabase Storage |
-| Forms | react-hook-form + zod |
-| Email | Resend |
-| Charts | Recharts |
-| Calendar | react-big-calendar |
-| QR Codes | qrcode.react + html5-qrcode |
-| Theming | next-themes |
-| Containerization | Docker |
+- [Overview](#-overview)
+- [Features](#-features)
+- [Technology Stack](#-technology-stack)
+- [Database Schema](#-database-schema)
+- [Getting Started](#-getting-started)
+- [Project Structure](#-project-structure)
+- [Key Highlights](#-key-highlights)
+- [Screenshots](#-screenshots)
+- [Documentation](#-documentation)
 
-## 📋 Prerequisites
+---
 
-- Node.js 20+
-- npm 9+
-- A [Supabase](https://supabase.com) project
-- (Optional) A [Resend](https://resend.com) API key for emails
+## 🎯 Overview
 
-## ⚡ Quick Start
+The Campus Events Management Platform is a modern, scalable solution designed to streamline event management in educational institutions. It provides separate interfaces for students and administrators, featuring real-time updates, QR code-based check-ins, and comprehensive analytics.
 
-### 1. Clone and Install
+### Purpose
+- Centralize event information and registration
+- Automate check-in processes with QR technology
+- Provide insights through analytics dashboard
+- Enhance student engagement with events
 
-```bash
-git clone <repo-url>
-cd campus-events
-npm install
+---
+
+## ✨ Features
+
+### For Students
+- 🔐 **Secure Authentication** - Email/password with password reset
+- 🎫 **Event Discovery** - Browse, search, and filter events
+- 📝 **One-Click Registration** - Simple registration process
+- 📱 **QR Code Tickets** - Automatic QR code generation
+- 📊 **Personal Dashboard** - Track registrations and attendance
+- 📅 **Calendar View** - Visual event calendar
+- 🔔 **Announcements** - Receive event updates
+
+
+### For Administrators
+- 🎪 **Event Management** - Create, edit, and delete events
+- 📸 **QR Code Scanner** - Three scanning methods (camera/image/manual)
+- 📊 **Analytics Dashboard** - Comprehensive event statistics
+- 👥 **Admin Invitations** - Invite and manage administrators
+- 📣 **Announcements** - Post updates to students
+- 📋 **Registration Management** - View and manage registrations
+- ✅ **Real-Time Check-ins** - Live check-in tracking
+
+---
+
+## 🛠 Technology Stack
+
+### Frontend
+- **Framework:** Next.js 14 (App Router, TypeScript)
+- **Styling:** Tailwind CSS
+- **UI Components:** Shadcn/ui (Radix UI)
+- **Icons:** Lucide React
+- **Notifications:** Sonner
+
+### Backend
+- **Database:** Supabase (PostgreSQL)
+- **Authentication:** Supabase Auth
+- **Storage:** Supabase Storage
+- **Email:** Custom Email API
+
+### Libraries
+- **QR Code Generation:** qrcode
+- **QR Code Scanning:** jsQR
+- **Form Management:** React Hook Form
+- **Validation:** Zod
+- **Date Utilities:** date-fns
+
+### Deployment
+- **Hosting:** Vercel
+- **Database:** Supabase Cloud
+- **CDN:** Vercel Edge Network
+
+---
+
+## 🗄 Database Schema
+
+### Entity Relationship Diagram
+
+```mermaid
+erDiagram
+    users ||--o{ registrations : "registers for"
+    users ||--o{ events : "creates"
+    users ||--o{ announcements : "posts"
+    users ||--o{ admin_invitations : "invites"
+    events ||--o{ registrations : "has"
+    events ||--o{ announcements : "has"
+    events ||--o{ waitlist : "has"
+    users ||--o{ waitlist : "joins"
+
+
+    users {
+        uuid id PK
+        text name
+        text email UK
+        text role "student or admin"
+        text avatar_url
+        timestamptz created_at
+    }
+
+    events {
+        uuid id PK
+        text title
+        text description
+        text banner_url
+        text category
+        text venue
+        timestamptz event_date
+        timestamptz registration_deadline
+        int total_seats
+        int seats_remaining
+        uuid created_by FK
+        boolean completed
+        timestamptz created_at
+    }
+
+    registrations {
+        uuid id PK
+        uuid user_id FK
+        uuid event_id FK
+        text status "confirmed or cancelled"
+        text qr_code UK "Format: REG-XXXXXX"
+        boolean checked_in
+        timestamptz registered_at
+    }
+
+    announcements {
+        uuid id PK
+        uuid event_id FK "NULL for general"
+        text title
+        text message
+        uuid posted_by FK
+        timestamptz posted_at
+    }
+
+    admin_invitations {
+        uuid id PK
+        text email
+        uuid invited_by FK
+        text status "pending, accepted, expired"
+        text token UK
+        timestamptz expires_at
+        timestamptz created_at
+    }
+
+    waitlist {
+        uuid id PK
+        uuid user_id FK
+        uuid event_id FK
+        int position
+        timestamptz joined_at
+    }
 ```
 
-### 2. Set Up Environment Variables
+### Key Database Features
+- **Row-Level Security (RLS)** - Enforced data access control
+- **Stored Procedures** - Atomic operations for seat management
+- **Indexes** - Optimized query performance
+- **Constraints** - Data integrity enforcement
+- **Cascading Deletes** - Automatic cleanup of related data
 
-```bash
-cp .env.local.example .env.local
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js 18+ 
+- npm or yarn
+- Supabase account
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd campus-events
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Set up environment variables**
+   Create `.env.local` file:
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   NEXT_PUBLIC_APP_URL=http://localhost:3000
+   ```
+
+4. **Set up database**
+   - Create a new Supabase project
+   - Run migrations from `/supabase/migration.sql`
+   - Enable Row Level Security (RLS)
+
+5. **Run development server**
+   ```bash
+   npm run dev
+   ```
+
+6. **Open browser**
+   Navigate to `http://localhost:3000`
+
+### Initial Setup
+
+1. **Register first user** at `/register`
+2. **Make user admin** via Supabase SQL Editor:
+   ```sql
+   UPDATE users SET role = 'admin' WHERE email = 'your-email@example.com';
+   ```
+3. **Access admin panel** at `/admin`
+
+---
+
+## 📁 Project Structure
+
+```
+campus-events/
+├── src/
+│   ├── app/
+│   │   ├── (auth)/          # Authentication pages
+│   │   ├── (main)/          # Main application pages
+│   │   │   ├── admin/       # Admin panel pages
+│   │   │   ├── dashboard/   # Student dashboard
+│   │   │   ├── events/      # Event pages
+│   │   │   └── profile/     # User profile
+│   │   └── api/             # API routes
+│   ├── components/
+│   │   ├── admin/           # Admin components
+│   │   ├── dashboard/       # Dashboard components
+│   │   ├── layout/          # Layout components
+│   │   └── ui/              # UI components
+│   ├── lib/
+│   │   ├── actions/         # Server actions
+│   │   ├── supabase/        # Supabase utilities
+│   │   └── utils.ts         # Utility functions
+│   └── types/               # TypeScript types
+├── supabase/                # Database migrations
+└── public/                  # Static assets
 ```
 
-Edit `.env.local` with your Supabase credentials:
+---
 
-```env
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-RESEND_API_KEY=re_your_resend_key  # Optional
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-```
+## 🎯 Key Highlights
 
-### 3. Set Up Database
+### 1. QR Code Check-in System
+- **Three input methods**: Camera scanning, image upload, manual entry
+- **Works on all devices**: Desktop webcam and mobile camera support
+- **Real-time validation**: Instant check-in confirmation
+- **Duplicate prevention**: 3-second cooldown between same code scans
+- **Haptic feedback**: Vibration on successful scan (mobile)
 
-1. Go to your Supabase project → SQL Editor
-2. Run `supabase/migration.sql` — creates tables, RPC functions, RLS policies, storage buckets, and auth trigger
-3. Create demo users through the Supabase Dashboard (Authentication → Users):
-   - **Admin:** `admin@campus.edu` / `Admin@123` (set `raw_user_meta_data` to `{"name": "Admin User", "role": "admin"}`)
-   - **Student:** `alice@campus.edu` / `Student@123` (set `raw_user_meta_data` to `{"name": "Alice Johnson", "role": "student"}`)
-   - **Student:** `bob@campus.edu` / `Student@123` (set `raw_user_meta_data` to `{"name": "Bob Smith", "role": "student"}`)
-4. Run `supabase/seed.sql` — creates sample events and announcements
+### 2. Atomic Seat Management
+- **No overbooking**: Database-level seat reservation
+- **Concurrent handling**: Multiple simultaneous registrations
+- **Automatic waitlist**: Overflow management
+- **Auto-promotion**: Waitlist to confirmed on cancellation
 
-### 4. Run Development Server
+### 3. Role-Based Access Control
+- **Student role**: Browse and register for events
+- **Admin role**: Full platform management
+- **Invitation system**: Secure admin onboarding
+- **Protected routes**: Middleware authentication
+
+### 4. Real-Time Updates
+- **Instant seat updates**: Live availability display
+- **Check-in tracking**: Real-time check-in status
+- **Dashboard sync**: Automatic data refresh
+- **Cache revalidation**: Optimized data fetching
+
+### 5. Responsive Design
+- **Mobile-first**: Optimized for smartphones
+- **Tablet support**: Adapted layouts
+- **Desktop experience**: Full-featured interface
+- **Dark mode**: System preference detection
+
+---
+
+## 📸 Screenshots
+
+### Student Interface
+- Event Discovery Page
+- Event Details & Registration
+- Personal Dashboard
+- QR Code Ticket
+
+### Admin Interface
+- Admin Dashboard
+- Event Management
+- QR Code Scanner
+- Analytics Dashboard
+- Admin Invitations
+
+---
+
+## 📖 Documentation
+
+For detailed documentation, see:
+- **[PROJECT_DOCUMENTATION.md](./PROJECT_DOCUMENTATION.md)** - Complete feature documentation
+- **[Database Schema](./supabase/migration.sql)** - Database structure
+- **[API Documentation](#)** - API endpoints (if applicable)
+
+---
+
+## 🔒 Security Features
+
+- ✅ Secure authentication (Supabase Auth)
+- ✅ Password hashing (bcrypt)
+- ✅ JWT session tokens
+- ✅ Row-level security (RLS)
+- ✅ SQL injection prevention
+- ✅ XSS protection
+- ✅ CSRF tokens
+- ✅ Input validation
+- ✅ Secure file uploads
+- ✅ HTTPS enforcement
+
+---
+
+## ⚡ Performance
+
+- ✅ Server-side rendering (SSR)
+- ✅ Static generation where applicable
+- ✅ Image optimization
+- ✅ Code splitting
+- ✅ Lazy loading
+- ✅ Database query optimization
+- ✅ CDN delivery
+- ✅ Caching strategies
+
+---
+
+## 🧪 Testing
 
 ```bash
+# Run development server
 npm run dev
+
+# Build for production
+npm run build
+
+# Start production server
+npm start
+
+# Type checking
+npm run type-check
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+---
 
-## 🔑 Demo Credentials
+## 📦 Deployment
 
-| Role | Email | Password |
-|------|-------|----------|
-| Admin | admin@campus.edu | Admin@123 |
-| Student | alice@campus.edu | Student@123 |
-| Student | bob@campus.edu | Student@123 |
+### Vercel (Recommended)
 
-## 🏗 Architecture
+1. Push code to GitHub
+2. Import project in Vercel
+3. Configure environment variables
+4. Deploy
 
-```
-src/
-├── app/
-│   ├── (auth)/          # Auth pages (login, register)
-│   ├── (main)/          # Main app pages
-│   │   ├── events/      # Event listing, detail, calendar
-│   │   ├── dashboard/   # Student dashboard
-│   │   ├── admin/       # Admin panel
-│   │   └── profile/     # User profile
-│   ├── api/             # API routes (email)
-│   ├── layout.tsx       # Root layout
-│   └── page.tsx         # Landing page
-├── components/
-│   ├── ui/              # shadcn/ui components
-│   ├── layout/          # Header, footer, theme toggle
-│   ├── events/          # Event-related components
-│   ├── dashboard/       # Dashboard components
-│   └── admin/           # Admin components
-├── lib/
-│   ├── supabase/        # Supabase client setup
-│   ├── actions/         # Server actions
-│   └── utils.ts         # Utility functions
-└── types/
-    └── database.ts      # TypeScript types
+### Environment Variables for Production
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_production_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_production_key
+NEXT_PUBLIC_APP_URL=https://your-domain.com
 ```
 
-### Key Design Decisions
+---
 
-- **Atomic Seat Management** — PostgreSQL RPC functions prevent race-condition overbooking
-- **Row Level Security** — All tables have RLS policies; admin checks use subqueries on `public.users`
-- **Defense in Depth** — Routes protected both by Next.js middleware AND Supabase RLS
-- **Server Actions** — All mutations use Next.js Server Actions for type-safe, automatic revalidation
+## 🤝 Contributing
 
-See [DECISIONS.md](./DECISIONS.md) for the complete list of engineering decisions.
+This project was developed for internship and hackathon purposes. For any queries or suggestions, please contact the developer.
 
-## 🐳 Docker
-
-### Build and Run
-
-```bash
-# Build the image
-docker build \
-  --build-arg NEXT_PUBLIC_SUPABASE_URL=your_url \
-  --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY=your_key \
-  -t campus-events .
-
-# Run the container
-docker run -p 3000:3000 \
-  -e RESEND_API_KEY=your_key \
-  campus-events
-```
-
-### Docker Compose
-
-```bash
-# Set environment variables in .env file, then:
-docker-compose up --build
-```
-
-## 📦 Database Schema
-
-| Table | Description |
-|-------|------------|
-| `public.users` | App user profiles (extends `auth.users`) |
-| `public.events` | Campus events with metadata |
-| `public.registrations` | Event registrations with QR codes |
-| `public.announcements` | Global and event-specific announcements |
-
-### RPC Functions
-- `register_for_event(p_event_id, p_user_id)` — Atomically registers a user
-- `cancel_registration(p_registration_id, p_user_id)` — Cancels and frees seat
-- `check_in_registration(p_qr_code)` — Marks attendance via QR token
+---
 
 ## 📝 License
 
-MIT License — built as an internship assignment.
+This project is part of an academic/internship portfolio.
+
+---
+
+## 👨‍💻 Developer
+
+**[Your Name]**
+- Email: [your-email@example.com]
+- LinkedIn: [Your LinkedIn]
+- GitHub: [Your GitHub]
+
+---
+
+## 🙏 Acknowledgments
+
+- Next.js team for the amazing framework
+- Supabase for the backend infrastructure
+- Shadcn for the beautiful UI components
+- The open-source community
+
+---
+
+## 📊 Project Statistics
+
+- **Lines of Code:** 10,000+
+- **Components:** 50+
+- **Database Tables:** 6
+- **API Endpoints:** 10+
+- **Features:** 40+
+
+---
+
+**⭐ If you find this project useful, please consider giving it a star!**
+
+---
+

@@ -1,10 +1,11 @@
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Plus, Edit, Trash, Users } from 'lucide-react';
+import { Plus, Edit, Trash, Users, Clock } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 import { Event } from '@/types/database';
 import { EventCompletionButton } from '@/components/admin/event-completion-button';
+import { Badge } from '@/components/ui/badge';
 
 export default async function AdminEventsPage() {
   const supabase = await createClient();
@@ -21,16 +22,29 @@ export default async function AdminEventsPage() {
     `)
     .order('event_date', { ascending: false });
 
-  // Process events to include registration stats
+  // Get waitlist counts for all events
+  const { data: waitlistData } = await (supabase as any)
+    .from('waitlist')
+    .select('event_id');
+
+  // Count waitlist entries per event
+  const waitlistCounts = (waitlistData || []).reduce((acc: Record<string, number>, entry: any) => {
+    acc[entry.event_id] = (acc[entry.event_id] || 0) + 1;
+    return acc;
+  }, {});
+
+  // Process events to include registration stats and waitlist counts
   const events = eventsData?.map(event => {
     const registrations = (event.registrations as any[]) || [];
     const confirmedRegistrations = registrations.filter(r => r.status === 'confirmed');
     const checkedInCount = confirmedRegistrations.filter(r => r.checked_in).length;
+    const waitlistCount = waitlistCounts[event.id] || 0;
     
     return {
       ...event,
       totalRegistrations: confirmedRegistrations.length,
       checkedInCount,
+      waitlistCount,
     };
   }) || [];
 
@@ -65,7 +79,17 @@ export default async function AdminEventsPage() {
                   <td className="p-4 align-middle font-medium">{event.title}</td>
                   <td className="p-4 align-middle capitalize">{event.category}</td>
                   <td className="p-4 align-middle">{formatDate(event.event_date)}</td>
-                  <td className="p-4 align-middle">{event.seats_remaining} / {event.total_seats}</td>
+                  <td className="p-4 align-middle">
+                    <div className="flex items-center gap-2">
+                      <span>{event.seats_remaining} / {event.total_seats}</span>
+                      {event.waitlistCount > 0 && event.seats_remaining === 0 && (
+                        <Badge variant="outline" className="bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800 flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          {event.waitlistCount} waiting
+                        </Badge>
+                      )}
+                    </div>
+                  </td>
                   <td className="p-4 align-middle">
                     <EventCompletionButton
                       eventId={event.id}
