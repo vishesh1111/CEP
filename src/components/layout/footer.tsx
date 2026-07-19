@@ -1,10 +1,23 @@
-'use client';
-
 import Link from 'next/link';
 import { CalendarDays } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { createClient } from '@/lib/supabase/server';
 
-export function Footer() {
+export async function Footer() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  // Check if user is admin
+  let isAdmin = false;
+  if (user) {
+    const { data: profile } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+    isAdmin = profile?.role === 'admin';
+  }
+
   return (
     <footer className="border-t bg-card/50 backdrop-blur-sm">
       <div className="container mx-auto px-4 py-8 md:py-12">
@@ -43,9 +56,11 @@ export function Footer() {
               <Link href="/about" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 About Us
               </Link>
-              <Link href="/admin" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                Admin Panel
-              </Link>
+              {isAdmin && (
+                <Link href="/admin" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Admin Panel
+                </Link>
+              )}
               <Link href="/profile" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 My Profile
               </Link>
