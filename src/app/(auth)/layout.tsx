@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { HeatmapShader } from '@/components/ui/heatmap-shader';
 
 export default function AuthLayout({
   children,
@@ -19,14 +20,19 @@ export default function AuthLayout({
         </div>
       </div>
 
-      {/* Right pane - Decorative */}
-      <div className="hidden lg:flex relative bg-zinc-900 flex-col items-center justify-center p-12 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 via-primary/5 to-transparent z-10" />
-        <div className="absolute w-[500px] h-[500px] bg-primary/30 rounded-full blur-[100px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-pulse" />
+      {/* Right pane - Decorative with Heatmap */}
+      <div className="hidden lg:flex relative bg-slate-50 dark:bg-black flex-col items-center justify-center p-12 overflow-hidden border-l border-border/50">
+        {/* Animated Heatmap Shader */}
+        <div className="absolute inset-0 z-0">
+          <HeatmapShader />
+        </div>
         
-        <div className="relative z-20 text-center space-y-6 max-w-lg">
-          <h2 className="text-4xl font-bold text-white font-heading">Join the Campus Community</h2>
-          <p className="text-zinc-400 text-lg">
+        {/* Content */}
+        <div className="relative z-20 text-center space-y-4 max-w-lg px-8">
+          <h2 className="text-5xl font-bold text-slate-900 dark:text-white font-heading tracking-tight drop-shadow-md dark:drop-shadow-[0_2px_20px_rgba(0,0,0,0.5)]">
+            Join the Campus Community
+          </h2>
+          <p className="text-slate-700 dark:text-white text-base leading-relaxed drop-shadow-sm dark:drop-shadow-[0_2px_15px_rgba(0,0,0,0.5)]">
             Discover amazing events, connect with peers, and make the most out of your college experience.
           </p>
         </div>
