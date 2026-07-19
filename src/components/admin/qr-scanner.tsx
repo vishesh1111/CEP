@@ -52,27 +52,47 @@ export default function QrScanner({ onScan }: QrScannerProps) {
     try {
       const config: Html5QrcodeCameraScanConfig = {
         fps: 10,
-        qrbox: { width: 250, height: 250 },
+        qrbox: function(viewfinderWidth, viewfinderHeight) {
+          // Use 70% of the smallest dimension
+          const minEdgeSize = Math.min(viewfinderWidth, viewfinderHeight);
+          const qrboxSize = Math.floor(minEdgeSize * 0.7);
+          return {
+            width: qrboxSize,
+            height: qrboxSize
+          };
+        },
         aspectRatio: 1.0,
+        disableFlip: false,
+        videoConstraints: {
+          facingMode: { ideal: 'environment' }
+        }
       };
 
       const cameraIdToUse = cameraId || cameras[currentCameraIndex]?.id || { facingMode: 'environment' };
 
+      console.log('Starting scanner with config:', config);
+      console.log('Camera ID:', cameraIdToUse);
+
       await scannerRef.current.start(
         cameraIdToUse,
         config,
-        (decodedText) => {
+        (decodedText, decodedResult) => {
+          console.log('QR Code detected:', decodedText);
+          
           // Prevent duplicate scans of the same code within 3 seconds
           const now = Date.now();
           const lastScan = lastScannedRef.current;
           
           if (lastScan && lastScan.code === decodedText && (now - lastScan.timestamp) < 3000) {
             // Same code scanned within 3 seconds - ignore
+            console.log('Duplicate scan ignored');
             return;
           }
           
           // Update last scanned info
           lastScannedRef.current = { code: decodedText, timestamp: now };
+          
+          console.log('Processing scan:', decodedText);
           
           // Process the scan
           onScan(decodedText);
@@ -83,10 +103,14 @@ export default function QrScanner({ onScan }: QrScannerProps) {
           }
         },
         (errorMessage) => {
-          // Ignore error messages during normal scanning
+          // Only log significant errors, ignore scanning errors
+          if (errorMessage && !errorMessage.includes('NotFoundException')) {
+            console.log('Scanner error (non-critical):', errorMessage);
+          }
         }
       );
 
+      console.log('Scanner started successfully');
       setIsScanning(true);
       setIsLoading(false);
     } catch (err: any) {
