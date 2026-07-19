@@ -95,15 +95,20 @@ export default function QrScannerJsQR({ onScan }: QrScannerProps) {
     try {
       console.log('=== STARTING JSQR SCANNER ===');
       
-      // Request camera access with mobile-optimized constraints
+      // Detect device type for optimal settings
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      
+      // Request camera access - works on both mobile and desktop
       const constraints: MediaStreamConstraints = {
         video: {
-          facingMode: { ideal: 'environment' },
+          // On mobile prefer rear camera, on desktop use any available camera
+          facingMode: isMobile ? { ideal: 'environment' } : 'user',
           width: { ideal: 1280 },
           height: { ideal: 720 },
         },
       };
 
+      console.log('Device type:', isMobile ? 'Mobile' : 'Desktop/Laptop');
       console.log('Requesting camera with constraints:', constraints);
 
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -161,16 +166,6 @@ export default function QrScannerJsQR({ onScan }: QrScannerProps) {
         {/* Scanning overlay with corner markers */}
         {isScanning && (
           <div className="absolute inset-0">
-            {/* Scanning instructions */}
-            <div className="absolute top-4 left-4 right-4 bg-blue-600 text-white text-sm p-4 rounded-lg shadow-lg z-10">
-              <p className="font-bold mb-2">📱 SCANNING ACTIVE</p>
-              <ul className="space-y-1 text-xs">
-                <li>✓ Hold QR 20-40cm away</li>
-                <li>✓ Keep centered & steady</li>
-                <li>✓ Ensure good lighting</li>
-              </ul>
-            </div>
-
             {/* Corner markers for scanning area */}
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="relative w-64 h-64">
@@ -183,6 +178,11 @@ export default function QrScannerJsQR({ onScan }: QrScannerProps) {
                 {/* Bottom-right corner */}
                 <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-green-500"></div>
               </div>
+            </div>
+
+            {/* Scanning instructions - moved to bottom, more compact */}
+            <div className="absolute bottom-4 left-4 right-4 bg-blue-600/90 backdrop-blur-sm text-white text-xs p-3 rounded-lg shadow-lg z-10">
+              <p className="font-bold mb-1.5">📸 SCANNING • Hold QR 15-30cm away • Keep centered</p>
             </div>
           </div>
         )}
@@ -222,7 +222,7 @@ export default function QrScannerJsQR({ onScan }: QrScannerProps) {
 
       {/* Info */}
       <p className="text-xs text-center text-muted-foreground">
-        Using jsQR scanner - Optimized for mobile devices
+        Works on all devices - Mobile camera • Laptop webcam • Desktop camera
       </p>
     </div>
   );
