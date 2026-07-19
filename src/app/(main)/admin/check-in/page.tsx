@@ -11,7 +11,7 @@ import { CheckCircle, User, Calendar, MapPin, Clock, Ticket, AlertCircle, Upload
 import { formatDate, formatDateTime } from '@/lib/utils';
 import { Html5Qrcode } from 'html5-qrcode';
 
-const QrScanner = dynamic(() => import('@/components/admin/qr-scanner'), { ssr: false });
+const QrScanner = dynamic(() => import('@/components/admin/qr-scanner-jsqr'), { ssr: false });
 
 interface CheckInResult {
   id: string;
