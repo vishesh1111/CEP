@@ -9,6 +9,15 @@ A comprehensive full-stack web application for managing college events, student 
 | **🚀 Live Application** | [https://event-portal-eu.vercel.app/](https://event-portal-eu.vercel.app/) |
 | **🎥 Demo Video** | *[Coming Soon - Will be added]* |
 
+
+Try it immediately with these demo accounts:
+
+| Role | Email | Password |
+|------|-------|----------|
+| **Admin** | `[test@example.com]` | `[password123]` |
+
+> Log in as **Admin** to see the full event-management, analytics, and check-in tooling. Log in as **Student** to see registration, QR tickets, certificates, and the waitlist flow.
+
 [![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)](https://www.typescriptlang.org/)
 [![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-green)](https://supabase.com/)
