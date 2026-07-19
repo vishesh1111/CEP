@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Star, MessageSquare } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { submitFeedback, getFeedbackByUser } from '@/lib/actions/feedback';
 import { cn } from '@/lib/utils';
@@ -12,10 +12,9 @@ import { cn } from '@/lib/utils';
 interface FeedbackDialogProps {
   eventId: string;
   eventTitle: string;
-  trigger?: React.ReactNode;
 }
 
-export function FeedbackDialog({ eventId, eventTitle, trigger }: FeedbackDialogProps) {
+export function FeedbackDialog({ eventId, eventTitle }: FeedbackDialogProps) {
   const [open, setOpen] = useState(false);
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
@@ -70,18 +69,9 @@ export function FeedbackDialog({ eventId, eventTitle, trigger }: FeedbackDialogP
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger 
-        nativeButton={false}
-        render={
-          trigger ? (trigger as React.ReactElement) : <Button variant="outline" className="w-full" />
-        }
-      >
-        {!trigger && (
-          <>
-            <MessageSquare className="w-4 h-4 mr-2" />
-            <span>{existingFeedback ? 'Edit Feedback' : 'Leave Feedback'}</span>
-          </>
-        )}
+      <DialogTrigger className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), "w-full cursor-pointer")}>
+        <MessageSquare className="w-4 h-4 mr-2" />
+        <span>{existingFeedback ? 'Edit Feedback' : 'Leave Feedback'}</span>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>

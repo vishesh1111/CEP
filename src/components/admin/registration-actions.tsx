@@ -78,8 +78,6 @@ export function RegistrationActions({
         <AlertDialogTrigger
           className="inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3 text-destructive hover:text-destructive cursor-pointer"
           disabled={isRemoving}
-          nativeButton={false}
-          render={<div role="button" tabIndex={0} />}
         >
           {isRemoving ? (
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -124,8 +122,6 @@ export function RegistrationActions({
         <AlertDialogTrigger
           className="inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background border border-orange-200 bg-background hover:bg-orange-50 h-9 px-3 text-orange-600 hover:text-orange-700 cursor-pointer"
           disabled={isBanning}
-          nativeButton={false}
-          render={<div role="button" tabIndex={0} />}
         >
           {isBanning ? (
             <Loader2 className="h-4 w-4 animate-spin" />

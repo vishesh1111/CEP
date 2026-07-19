@@ -36,10 +36,10 @@ export function EventCard({ event, userRegistration, waitlistCount = 0, index = 
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.5, delay: Math.min(index * 0.1, 0.5), type: "spring", stiffness: 200, damping: 20 }}
+      transition={{ duration: 0.3, delay: Math.min(index * 0.05, 0.3), ease: 'easeOut' }}
       whileHover={{ y: -6, scale: 1.01, transition: { duration: 0.2 } }}
       className="h-full"
     >
@@ -49,7 +49,15 @@ export function EventCard({ event, userRegistration, waitlistCount = 0, index = 
       <Link href={`/events/${event.id}`} prefetch={true} className="block">
         <div className="relative h-48 w-full bg-muted">
           {event.banner_url ? (
-            <Image src={event.banner_url} alt={event.title} fill className="object-cover" />
+            <Image 
+              src={event.banner_url} 
+              alt={event.title} 
+              fill 
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              loading={index < 3 ? 'eager' : 'lazy'}
+              priority={index < 3}
+            />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
               <span className="text-muted-foreground font-medium">No Image</span>

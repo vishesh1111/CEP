@@ -8,11 +8,15 @@ import { Footer } from '@/components/layout/footer';
 const inter = Inter({
   variable: '--font-sans',
   subsets: ['latin'],
+  display: 'swap',
+  preload: true,
 });
 
 const outfit = Outfit({
   variable: '--font-heading',
   subsets: ['latin'],
+  display: 'swap',
+  preload: true,
 });
 
 export const metadata: Metadata = {

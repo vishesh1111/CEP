@@ -211,8 +211,8 @@ export function RegistrationCard({ registration, isPast }: RegistrationCardProps
             
             {isPast && (
               <div className="bg-muted/30 border-t sm:border-t-0 sm:border-l p-4 flex sm:flex-col items-center justify-end sm:justify-center gap-2 sm:w-40 shrink-0">
-                {/* Certificate Download - only if checked in */}
-                {registration.checked_in ? (
+                {/* Certificate Download - only if checked in AND event is completed */}
+                {registration.checked_in && (event as any).completed ? (
                   <Button
                     variant="outline"
                     size="sm"
@@ -227,30 +227,48 @@ export function RegistrationCard({ registration, isPast }: RegistrationCardProps
                     )}
                     <span>Certificate</span>
                   </Button>
+                ) : registration.checked_in && !(event as any).completed ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full opacity-50 cursor-not-allowed"
+                    disabled
+                    title="Certificate available when event is marked complete by admin"
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    <span>Certificate</span>
+                  </Button>
                 ) : (
                   <Button
                     variant="outline"
                     size="sm"
                     className="w-full opacity-50 cursor-not-allowed"
                     disabled
-                    title="Available after event check-in"
+                    title="Available after event check-in and completion"
                   >
                     <Download className="w-4 h-4 mr-2" />
                     <span>Certificate</span>
                   </Button>
                 )}
 
-                {/* Feedback Button */}
-                <FeedbackDialog
-                  eventId={event.id}
-                  eventTitle={event.title}
-                  trigger={
-                    <Button variant="outline" size="sm" className="w-full">
-                      <MessageSquare className="w-4 h-4 mr-2" />
-                      <span>Feedback</span>
-                    </Button>
-                  }
-                />
+                {/* Feedback Button - only if event is completed */}
+                {(event as any).completed ? (
+                  <FeedbackDialog
+                    eventId={event.id}
+                    eventTitle={event.title}
+                  />
+                ) : (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full opacity-50 cursor-not-allowed"
+                    disabled
+                    title="Feedback available when event is marked complete by admin"
+                  >
+                    <MessageSquare className="w-4 h-4 mr-2" />
+                    <span>Feedback</span>
+                  </Button>
+                )}
               </div>
             )}
           </div>

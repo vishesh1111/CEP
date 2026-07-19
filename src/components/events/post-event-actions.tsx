@@ -70,12 +70,6 @@ export function PostEventActions({ registration, event }: { registration: any, e
       <FeedbackDialog
         eventId={event.id}
         eventTitle={event.title}
-        trigger={
-          <Button variant="outline" className="w-full">
-            <MessageSquare className="w-4 h-4 mr-2" />
-            Give Feedback
-          </Button>
-        }
       />
     </div>
   );

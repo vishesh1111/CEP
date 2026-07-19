@@ -26,6 +26,8 @@ export type Event = {
   created_by: string | null;
   created_at: string;
   updated_at: string;
+  completed: boolean;
+  completed_at: string | null;
 };
 
 export type Registration = {
@@ -92,10 +94,12 @@ export type Database = {
       };
       events: {
         Row: Event;
-        Insert: Omit<Event, 'id' | 'created_at' | 'updated_at'> & {
+        Insert: Omit<Event, 'id' | 'created_at' | 'updated_at' | 'completed' | 'completed_at'> & {
           id?: string;
           created_at?: string;
           updated_at?: string;
+          completed?: boolean;
+          completed_at?: string;
         };
         Update: Partial<Omit<Event, 'id'>>;
         Relationships: [
@@ -222,6 +226,14 @@ export type Database = {
       check_in_registration: {
         Args: { p_qr_code: string };
         Returns: Registration;
+      };
+      mark_event_completed: {
+        Args: { p_event_id: string };
+        Returns: any;
+      };
+      reopen_event: {
+        Args: { p_event_id: string };
+        Returns: any;
       };
     };
   };

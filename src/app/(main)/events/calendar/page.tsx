@@ -532,9 +532,9 @@ export default function CalendarPage() {
         .calendar-card-light::before {
           content: '';
           position: absolute;
-          inset: -2px;
+          inset: -4px;
           border-radius: inherit;
-          padding: 2px;
+          padding: 4px;
           background: linear-gradient(120deg, #6366f1, #a855f7, #6366f1);
           background-size: 200% 200%;
           animation: borderFlow 6s ease infinite;
@@ -571,10 +571,10 @@ export default function CalendarPage() {
       {/* Mobile Calendar View */}
       {isMounted && isMobile && (
         <div
-          className={`relative border rounded-xl p-4 bg-card z-0 transition-all duration-300 ${!isDark ? 'calendar-card-light' : ''}`}
+          className={`relative rounded-xl z-0 transition-all duration-300 ${!isDark ? 'calendar-card-light' : ''}`}
         >
           {isDark && (
-            <div className="absolute inset-0 -z-10 pointer-events-none rounded-xl overflow-hidden">
+            <div className="absolute -inset-4 -z-10 pointer-events-none rounded-xl">
               <PulsingBorder
                 colors={['#6366f1']}
                 colorBack="#ffffff00"
@@ -593,22 +593,23 @@ export default function CalendarPage() {
               />
             </div>
           )}
-          <MobileCalendarView
-            events={events}
-            currentDate={date}
-            onNavigate={setDate}
-          />
+          <div className="border rounded-xl p-4 bg-card">
+            <MobileCalendarView
+              events={events}
+              currentDate={date}
+              onNavigate={setDate}
+            />
+          </div>
         </div>
       )}
 
       {/* Desktop Calendar View */}
       {isMounted && !isMobile && (
         <div
-          className={`relative border rounded-lg p-6 bg-card z-0 transition-all duration-300 overflow-x-auto ${!isDark ? 'calendar-card-light' : ''}`}
-          style={{ minHeight: '750px' }}
+          className={`relative rounded-lg z-0 transition-all duration-300 ${!isDark ? 'calendar-card-light' : ''}`}
         >
           {isDark && (
-            <div className="absolute inset-0 -z-10 pointer-events-none rounded-lg">
+            <div className="absolute -inset-4 -z-10 pointer-events-none rounded-lg">
               <PulsingBorder
                 colors={['#6366f1']}
                 colorBack="#ffffff00"
@@ -627,31 +628,36 @@ export default function CalendarPage() {
               />
             </div>
           )}
-          <div className="min-w-[700px]">
-            <Calendar
-              localizer={localizer}
-              events={events}
-              startAccessor="start"
-              endAccessor="end"
-              style={{ height: 700 }}
-              onSelectEvent={handleSelectEvent}
-              view={view}
-              onView={setView}
-              date={date}
-              onNavigate={setDate}
-              views={['month', 'week', 'day', 'agenda']}
-              defaultView="month"
-              step={30}
-              timeslots={2}
-              min={new Date(2024, 0, 1, 7, 0, 0)}
-              max={new Date(2024, 0, 1, 22, 0, 0)}
-              showMultiDayTimes
-              popup
-              eventPropGetter={eventStyleGetter}
-              components={{
-                event: EventComponent
-              }}
-            />
+          <div 
+            className="border rounded-lg p-6 bg-card overflow-x-auto" 
+            style={{ minHeight: '750px' }}
+          >
+            <div className="min-w-[700px]">
+              <Calendar
+                localizer={localizer}
+                events={events}
+                startAccessor="start"
+                endAccessor="end"
+                style={{ height: 700 }}
+                onSelectEvent={handleSelectEvent}
+                view={view}
+                onView={setView}
+                date={date}
+                onNavigate={setDate}
+                views={['month', 'week', 'day', 'agenda']}
+                defaultView="month"
+                step={30}
+                timeslots={2}
+                min={new Date(2024, 0, 1, 7, 0, 0)}
+                max={new Date(2024, 0, 1, 22, 0, 0)}
+                showMultiDayTimes
+                popup
+                eventPropGetter={eventStyleGetter}
+                components={{
+                  event: EventComponent
+                }}
+              />
+            </div>
           </div>
         </div>
       )}

@@ -37,7 +37,11 @@ export default async function DashboardPage() {
     .from('registrations')
     .select(`
       *,
-      events (*)
+      events (
+        *,
+        completed,
+        completed_at
+      )
     `)
     .eq('user_id', user.id)
     .eq('status', 'confirmed')

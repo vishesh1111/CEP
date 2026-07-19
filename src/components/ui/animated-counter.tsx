@@ -18,12 +18,16 @@ export function AnimatedCounter({
   suffix = '',
   className = ''
 }: AnimatedCounterProps) {
-  const [count, setCount] = useState(from);
+  const [count, setCount] = useState(to); // Start with final value to avoid flash
   const ref = useRef<HTMLSpanElement>(null);
   const isInView = useInView(ref, { once: true, margin: '-100px' });
+  const [hasAnimated, setHasAnimated] = useState(false);
 
   useEffect(() => {
-    if (!isInView) return;
+    if (!isInView || hasAnimated) return;
+
+    setHasAnimated(true);
+    setCount(from); // Reset to start value when animation begins
 
     const startTime = Date.now();
     const endTime = startTime + duration;
@@ -47,7 +51,7 @@ export function AnimatedCounter({
     };
 
     requestAnimationFrame(updateCount);
-  }, [isInView, from, to, duration]);
+  }, [isInView, from, to, duration, hasAnimated]);
 
   return (
     <span ref={ref} className={className}>
@@ -55,3 +59,4 @@ export function AnimatedCounter({
     </span>
   );
 }
+

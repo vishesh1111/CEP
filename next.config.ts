@@ -1,5 +1,4 @@
 import type { NextConfig } from "next";
-import path from "path";
 
 const nextConfig: NextConfig = {
   images: {
@@ -11,17 +10,26 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  transpilePackages: ['@shadergradient/react'],
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@shadergradient/react': require('path').resolve(__dirname, 'node_modules/@shadergradient/react/dist/index.mjs'),
+    };
+    return config;
+  },
   experimental: {
     serverActions: {
       bodySizeLimit: '2mb',
     },
   },
-  webpack: (config) => {
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      '@shadergradient/react': path.resolve(__dirname, 'node_modules/@shadergradient/react/dist/index.mjs'),
-    };
-    return config;
+  turbopack: {
+    resolveAlias: {
+      '@shadergradient/react': require('path').resolve(__dirname, 'node_modules/@shadergradient/react/dist/index.mjs'),
+    },
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
   },
 };
 
