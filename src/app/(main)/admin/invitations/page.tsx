@@ -24,6 +24,13 @@ export default async function AdminInvitationsPage() {
 
   const { invitations, error } = await getAdminInvitations();
 
+  // Get current admins
+  const { data: currentAdmins } = await supabase
+    .from('users')
+    .select('id, name, email, created_at')
+    .eq('role', 'admin')
+    .order('created_at', { ascending: false });
+
   return (
     <div className="container mx-auto py-8 px-4 max-w-5xl">
       <div className="mb-8">
@@ -34,6 +41,42 @@ export default async function AdminInvitationsPage() {
       </div>
 
       <div className="grid gap-8">
+        {/* Current Admins List */}
+        <div className="bg-card border rounded-xl p-6">
+          <h2 className="text-xl font-semibold mb-4">Current Admins ({currentAdmins?.length || 0})</h2>
+          {currentAdmins && currentAdmins.length > 0 ? (
+            <div className="space-y-2">
+              {currentAdmins.map((admin) => (
+                <div key={admin.id} className="flex items-center justify-between p-3 rounded-lg border bg-muted/30">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                      <span className="text-sm font-semibold text-primary">
+                        {admin.name?.charAt(0).toUpperCase() || admin.email.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                    <div>
+                      <p className="font-medium">{admin.name}</p>
+                      <p className="text-sm text-muted-foreground">{admin.email}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
+                      Admin
+                    </span>
+                    {admin.id === user.id && (
+                      <p className="text-xs text-muted-foreground mt-1">(You)</p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              No admins found
+            </div>
+          )}
+        </div>
+
         {/* Invite Form */}
         <div className="bg-card border rounded-xl p-6">
           <h2 className="text-xl font-semibold mb-4">Invite New Admin</h2>
