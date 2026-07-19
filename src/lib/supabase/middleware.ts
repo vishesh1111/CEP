@@ -45,7 +45,11 @@ export async function updateSession(request: NextRequest) {
   }
 
   // Redirect authenticated users away from auth pages
-  if (user && (pathname === '/login' || pathname === '/register')) {
+  // BUT always allow forgot-password, reset-password, and auth/callback regardless of auth state
+  const alwaysAllowed = ['/forgot-password', '/reset-password', '/auth/callback'];
+  const isAlwaysAllowed = alwaysAllowed.some((p) => pathname.startsWith(p));
+
+  if (user && (pathname === '/login' || pathname === '/register') && !isAlwaysAllowed) {
     const url = request.nextUrl.clone();
     url.pathname = '/dashboard';
     return NextResponse.redirect(url);

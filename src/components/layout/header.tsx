@@ -3,12 +3,12 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Sparkles, Calendar, Menu, User, LogOut, LayoutDashboard, ChevronDown } from 'lucide-react';
-import { Button, buttonVariants } from '@/components/ui/button';
+import { Calendar, Menu, User, LogOut, LayoutDashboard } from 'lucide-react';
+import { buttonVariants } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { ThemeToggle } from '@/components/layout/theme-toggle';
 import { createClient } from '@/lib/supabase/client';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import type { User as AuthUser } from '@supabase/supabase-js';
@@ -20,53 +20,67 @@ export function Header() {
   const [userName, setUserName] = React.useState<string>('');
   const [hoveredPath, setHoveredPath] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [mobileOpen, setMobileOpen] = React.useState(false);
   
   const router = useRouter();
   const pathname = usePathname();
   const supabase = React.useMemo(() => createClient(), []);
 
+  // Close mobile menu on route change
   React.useEffect(() => {
-    async function getUser() {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        setUser(session.user);
-        setUserName(session.user.user_metadata?.name || 'User');
+    setMobileOpen(false);
+  }, [pathname]);
+
+  React.useEffect(() => {
+    let isMounted = true;
+
+    async function fetchUserAndRole(authUser: AuthUser) {
+      if (!isMounted) return;
+      setUser(authUser);
+      setUserName(authUser.user_metadata?.name || authUser.email?.split('@')[0] || 'User');
+      try {
         const { data } = await supabase
           .from('users')
           .select('role')
-          .eq('id', session.user.id)
+          .eq('id', authUser.id)
           .single();
-        if (data) {
-          const profile = data as { role: string };
-          setRole(profile.role);
+        if (data && isMounted) {
+          setRole((data as { role: string }).role);
         }
+      } catch {
+        // Role fetch failed, that's okay
       }
-      setIsLoading(false);
     }
-    getUser();
+
+    async function initAuth() {
+      try {
+        const { data: { user: authUser } } = await supabase.auth.getUser();
+        if (authUser) {
+          await fetchUserAndRole(authUser);
+        }
+      } catch {
+        // Auth check failed
+      }
+      if (isMounted) setIsLoading(false);
+    }
+
+    initAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session?.user) {
-        setUser(session.user);
-        setUserName(session.user.user_metadata?.name || 'User');
-        const { data } = await supabase
-          .from('users')
-          .select('role')
-          .eq('id', session.user.id)
-          .single();
-        if (data) {
-          const profile = data as { role: string };
-          setRole(profile.role);
-        }
+        await fetchUserAndRole(session.user);
       } else {
-        setUser(null);
-        setRole(null);
-        setUserName('');
+        if (isMounted) {
+          setUser(null);
+          setRole(null);
+          setUserName('');
+        }
       }
-      setIsLoading(false);
+      if (isMounted) setIsLoading(false);
     });
 
     return () => {
+      isMounted = false;
       subscription.unsubscribe();
     };
   }, [supabase]);
@@ -189,13 +203,13 @@ export function Header() {
             </div>
 
             {/* Mobile Menu */}
-            <Sheet>
+            <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
               <SheetTrigger className="md:hidden p-2.5 rounded-full hover:bg-muted/80 transition-colors border border-transparent hover:border-border/50">
                 <Menu className="h-5 w-5" />
                 <span className="sr-only">Toggle Menu</span>
               </SheetTrigger>
             <SheetContent side="right" className="border-l border-border/50 bg-background/95 backdrop-blur-xl supports-[backdrop-filter]:bg-background/80">
-              <Link href="/" className="flex items-center space-x-2 mb-8 mt-4 group">
+              <Link href="/" onClick={() => setMobileOpen(false)} className="flex items-center space-x-2 mb-8 mt-4 group">
                 <div className="bg-gradient-to-br from-blue-600 to-indigo-600 p-1.5 rounded-lg text-white shadow-sm shadow-blue-500/20 group-hover:scale-105 transition-transform duration-300">
                   <Calendar className="w-5 h-5" />
                 </div>
@@ -206,6 +220,7 @@ export function Header() {
                   <Link
                     key={link.label}
                     href={link.href}
+                    onClick={() => setMobileOpen(false)}
                     className={cn(
                       "text-sm font-medium px-4 py-3 rounded-xl transition-colors",
                       pathname === link.href 
@@ -221,21 +236,38 @@ export function Header() {
                     <div className="w-full h-12 bg-muted animate-pulse rounded-xl" />
                     <div className="w-full h-12 bg-muted animate-pulse rounded-xl" />
                   </div>
-                ) : !user ? (
-                  <div className="flex flex-col gap-3 mt-6">
-                    <Link href="/login" className={cn(buttonVariants({ variant: 'outline' }), 'w-full justify-center rounded-xl py-6')}>
-                      Sign In
+                ) : user ? (
+                  <div className="flex flex-col gap-2 mt-6 pt-6 border-t border-border/50">
+                    <div className="flex items-center gap-3 px-4 py-3">
+                      <Avatar className="h-10 w-10 border border-border/50">
+                        <AvatarImage src="" alt={userName} />
+                        <AvatarFallback className="bg-gradient-to-br from-blue-500 to-indigo-500 text-white text-sm font-medium">
+                          {userName[0]?.toUpperCase() || 'U'}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col">
+                        <span className="text-sm font-semibold">{userName}</span>
+                        <span className="text-xs text-muted-foreground">{user.email}</span>
+                      </div>
+                    </div>
+                    <Link href="/profile" onClick={() => setMobileOpen(false)} className="text-sm font-medium px-4 py-3 rounded-xl hover:bg-muted/50 transition-colors flex items-center gap-2">
+                      <User className="h-4 w-4" /> Profile
                     </Link>
-                    <Link href="/register" className={cn(buttonVariants(), 'w-full justify-center bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl py-6 shadow-md')}>
-                      Get Started
+                    <Link href="/dashboard" onClick={() => setMobileOpen(false)} className="text-sm font-medium px-4 py-3 rounded-xl hover:bg-muted/50 transition-colors flex items-center gap-2">
+                      <LayoutDashboard className="h-4 w-4" /> Dashboard
                     </Link>
+                    <button onClick={() => { setMobileOpen(false); handleLogout(); }} className="text-sm font-medium text-left px-4 py-3 rounded-xl hover:bg-destructive/10 text-destructive transition-colors flex items-center gap-2">
+                      <LogOut className="h-4 w-4" /> Log out
+                    </button>
                   </div>
                 ) : (
-                  <div className="flex flex-col gap-2 mt-6 pt-6 border-t border-border/50">
-                    <Link href="/profile" className="text-sm font-medium px-4 py-3 rounded-xl hover:bg-muted/50 transition-colors">Profile</Link>
-                    <button onClick={handleLogout} className="text-sm font-medium text-left px-4 py-3 rounded-xl hover:bg-destructive/10 text-destructive transition-colors">
-                      Log out
-                    </button>
+                  <div className="flex flex-col gap-3 mt-6">
+                    <Link href="/login" onClick={() => setMobileOpen(false)} className={cn(buttonVariants({ variant: 'outline' }), 'w-full justify-center rounded-xl py-6')}>
+                      Sign In
+                    </Link>
+                    <Link href="/register" onClick={() => setMobileOpen(false)} className={cn(buttonVariants(), 'w-full justify-center bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl py-6 shadow-md')}>
+                      Get Started
+                    </Link>
                   </div>
                 )}
               </div>

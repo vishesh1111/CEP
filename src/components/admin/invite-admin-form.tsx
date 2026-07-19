@@ -29,6 +29,8 @@ export function InviteAdminForm() {
   const [isPending, setIsPending] = useState(false);
   const [invitationLink, setInvitationLink] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [promotedEmail, setPromotedEmail] = useState<string | null>(null);
+  const [tableMissing, setTableMissing] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -40,15 +42,25 @@ export function InviteAdminForm() {
   async function onSubmit(data: FormValues) {
     setIsPending(true);
     setInvitationLink(null);
+    setPromotedEmail(null);
+    setTableMissing(false);
     
     try {
       const result = await inviteAdmin(data.email);
       
       if (result.error) {
         toast.error(result.error);
-      } else {
-        toast.success(result.message || 'Invitation sent successfully!');
+      } else if ((result as any).promoted) {
+        toast.success(result.message || 'User promoted to admin!');
+        setPromotedEmail(data.email);
         form.reset();
+      } else {
+        toast.success(result.message || 'Invitation created!');
+        form.reset();
+        
+        if ((result as any).noTable) {
+          setTableMissing(true);
+        }
         
         // Generate invitation link
         const baseUrl = window.location.origin;
@@ -110,6 +122,39 @@ export function InviteAdminForm() {
         </form>
       </Form>
 
+      {promotedEmail && (
+        <div className="bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900 rounded-lg p-4">
+          <div className="flex items-start gap-3">
+            <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400 mt-0.5 shrink-0" />
+            <div className="flex-1 space-y-1">
+              <p className="text-sm font-medium text-green-900 dark:text-green-100">
+                User Promoted to Admin!
+              </p>
+              <p className="text-sm text-green-700 dark:text-green-300">
+                <strong>{promotedEmail}</strong> now has admin access. They'll see the Admin panel on their next login.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {tableMissing && (
+        <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-lg p-4">
+          <div className="flex items-start gap-3">
+            <div className="h-5 w-5 text-amber-600 mt-0.5 shrink-0 text-lg leading-none">⚠️</div>
+            <div className="flex-1 space-y-1">
+              <p className="text-sm font-medium text-amber-900 dark:text-amber-100">
+                admin_invitations table not found in Supabase
+              </p>
+              <p className="text-sm text-amber-700 dark:text-amber-300">
+                Run <code className="bg-amber-100 dark:bg-amber-900 px-1 rounded text-xs">supabase/admin-invitations.sql</code> in the Supabase SQL Editor to enable invitation tracking.
+                Until then, invited users will sign up as <strong>students</strong> — you can promote them using this form after they register.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {invitationLink && (
         <div className="bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900 rounded-lg p-4">
           <div className="flex items-start gap-3">
@@ -139,9 +184,11 @@ export function InviteAdminForm() {
                   )}
                 </Button>
               </div>
-              <p className="text-xs text-green-600 dark:text-green-400">
-                💡 The invitation expires in 7 days. When they register with this email, they'll automatically become an admin.
-              </p>
+              {!tableMissing && (
+                <p className="text-xs text-green-600 dark:text-green-400">
+                  💡 The invitation expires in 7 days. When they register with this email, they'll automatically become an admin.
+                </p>
+              )}
             </div>
           </div>
         </div>

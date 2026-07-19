@@ -1,112 +1,54 @@
--- Admin Invitation System
--- Allows existing admins to invite new admins via email
+-- Fix admin_invitations table
+-- Run this in the Supabase SQL Editor
 
--- Create admin_invitations table
-create table if not exists public.admin_invitations (
-  id uuid primary key default gen_random_uuid(),
-  email text not null unique,
-  invited_by uuid references public.users(id) on delete cascade,
-  token text unique not null default encode(gen_random_bytes(32), 'hex'),
-  status text not null default 'pending' check (status in ('pending', 'accepted', 'expired')),
-  expires_at timestamptz not null default (now() + interval '7 days'),
-  created_at timestamptz default now(),
+-- 1. Drop the unique constraint on email so users can be re-invited after expiry
+-- (We allow multiple rows; only one pending per email enforced via app logic)
+
+-- First check if table exists and recreate cleanly
+DROP TABLE IF EXISTS public.admin_invitations CASCADE;
+
+CREATE TABLE public.admin_invitations (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  email text NOT NULL,
+  invited_by uuid REFERENCES public.users(id) ON DELETE SET NULL,
+  token text UNIQUE NOT NULL DEFAULT encode(gen_random_bytes(32), 'hex'),
+  status text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'expired')),
+  expires_at timestamptz NOT NULL DEFAULT (now() + interval '7 days'),
+  created_at timestamptz DEFAULT now(),
   accepted_at timestamptz
 );
 
 -- Enable RLS
-alter table public.admin_invitations enable row level security;
+ALTER TABLE public.admin_invitations ENABLE ROW LEVEL SECURITY;
 
--- Policies
-create policy "Admins can view all invitations" on public.admin_invitations
-  for select using (
-    exists (select 1 from public.users where id = auth.uid() and role = 'admin')
+-- Drop existing policies if any
+DROP POLICY IF EXISTS "Admins can view all invitations" ON public.admin_invitations;
+DROP POLICY IF EXISTS "Admins can create invitations" ON public.admin_invitations;
+DROP POLICY IF EXISTS "Admins can update invitations" ON public.admin_invitations;
+
+-- Policies: admins can do everything
+CREATE POLICY "Admins can view all invitations" ON public.admin_invitations
+  FOR SELECT USING (
+    EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin')
   );
 
-create policy "Admins can create invitations" on public.admin_invitations
-  for insert with check (
-    exists (select 1 from public.users where id = auth.uid() and role = 'admin')
+CREATE POLICY "Admins can create invitations" ON public.admin_invitations
+  FOR INSERT WITH CHECK (
+    EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin')
   );
 
-create policy "Admins can update invitations" on public.admin_invitations
-  for update using (
-    exists (select 1 from public.users where id = auth.uid() and role = 'admin')
+CREATE POLICY "Admins can update invitations" ON public.admin_invitations
+  FOR UPDATE USING (
+    EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin')
   );
 
--- Index for faster lookups
-create index if not exists idx_admin_invitations_token on public.admin_invitations(token);
-create index if not exists idx_admin_invitations_email on public.admin_invitations(email);
-create index if not exists idx_admin_invitations_status on public.admin_invitations(status);
+-- Indexes
+CREATE INDEX IF NOT EXISTS idx_admin_invitations_email ON public.admin_invitations(email);
+CREATE INDEX IF NOT EXISTS idx_admin_invitations_status ON public.admin_invitations(status);
+CREATE INDEX IF NOT EXISTS idx_admin_invitations_token ON public.admin_invitations(token);
 
--- Function to check if email has valid invitation
-create or replace function public.has_valid_admin_invitation(user_email text)
-returns boolean
-language plpgsql
-security definer
-as $$
-begin
-  return exists (
-    select 1 
-    from public.admin_invitations 
-    where email = user_email 
-      and status = 'pending' 
-      and expires_at > now()
-  );
-end;
-$$;
+-- Grant access to authenticated users (needed for RLS to work via app)
+GRANT SELECT, INSERT, UPDATE ON public.admin_invitations TO authenticated;
+GRANT SELECT, INSERT, UPDATE ON public.admin_invitations TO service_role;
 
--- Function to accept invitation
-create or replace function public.accept_admin_invitation(user_email text, user_id uuid)
-returns json
-language plpgsql
-security definer
-as $$
-declare
-  invitation_record record;
-begin
-  -- Get the invitation
-  select * into invitation_record
-  from public.admin_invitations
-  where email = user_email
-    and status = 'pending'
-    and expires_at > now()
-  limit 1;
-
-  -- Check if invitation exists
-  if not found then
-    return json_build_object('success', false, 'error', 'No valid invitation found');
-  end if;
-
-  -- Update invitation status
-  update public.admin_invitations
-  set status = 'accepted',
-      accepted_at = now()
-  where id = invitation_record.id;
-
-  -- Update user role to admin
-  update public.users
-  set role = 'admin'
-  where id = user_id;
-
-  return json_build_object('success', true, 'message', 'Admin invitation accepted');
-end;
-$$;
-
--- Function to cleanup expired invitations (run periodically)
-create or replace function public.cleanup_expired_invitations()
-returns void
-language plpgsql
-security definer
-as $$
-begin
-  update public.admin_invitations
-  set status = 'expired'
-  where status = 'pending'
-    and expires_at < now();
-end;
-$$;
-
--- Comments
-comment on table public.admin_invitations is 'Stores admin invitation tokens for secure admin onboarding';
-comment on function public.has_valid_admin_invitation is 'Checks if an email has a valid pending admin invitation';
-comment on function public.accept_admin_invitation is 'Accepts an admin invitation and promotes the user to admin';
-comment on function public.cleanup_expired_invitations is 'Marks expired invitations as expired (run via cron)';
+SELECT 'admin_invitations table created successfully' AS result;

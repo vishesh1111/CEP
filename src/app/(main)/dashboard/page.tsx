@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { RegistrationCard } from '@/components/dashboard/registration-card';
 import { AnnouncementsFeed } from '@/components/dashboard/announcements-feed';
+import { AdminInvitationBanner } from '@/components/dashboard/admin-invitation-banner';
 import { isEventPast } from '@/lib/utils';
 import { RegistrationWithEvent } from '@/types/database';
 
@@ -17,6 +18,20 @@ export default async function DashboardPage() {
   }
 
   const { data: profile } = await supabase.from('users').select('*').eq('id', user.id).maybeSingle() as any;
+
+  // Check for a pending admin invitation for this user's email
+  const { data: pendingInvitation } = await (supabase as any)
+    .from('admin_invitations')
+    .select('id, invited_by_user:users!admin_invitations_invited_by_fkey(name, email)')
+    .eq('email', user.email)
+    .eq('status', 'pending')
+    .gt('expires_at', new Date().toISOString())
+    .maybeSingle();
+
+  const inviterName =
+    pendingInvitation?.invited_by_user?.name ||
+    pendingInvitation?.invited_by_user?.email ||
+    'An admin';
 
   const { data: registrationsData } = await supabase
     .from('registrations')
@@ -52,6 +67,14 @@ export default async function DashboardPage() {
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-5xl">
+      {/* Admin invitation banner — only shown when a valid invite is pending */}
+      {pendingInvitation && (
+        <AdminInvitationBanner
+          invitationId={pendingInvitation.id}
+          inviterName={inviterName}
+        />
+      )}
+
       <div className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight mb-2">
           Welcome back, {profile?.name?.split(' ')[0] || user.email?.split('@')[0] || 'Student'}!

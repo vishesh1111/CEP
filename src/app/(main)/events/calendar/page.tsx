@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Calendar, momentLocalizer, Event, View } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
@@ -8,6 +8,8 @@ import { useRouter } from 'next/navigation';
 import { CATEGORY_COLORS } from '@/types/database';
 import { useTheme } from 'next-themes';
 import { PulsingBorder } from '@paper-design/shaders-react';
+import { ChevronLeft, ChevronRight, CalendarDays, List, Clock, Grid3X3 } from 'lucide-react';
+import Link from 'next/link';
 
 const localizer = momentLocalizer(moment);
 
@@ -21,6 +23,174 @@ interface EventData {
   allDay?: boolean;
 }
 
+// Mobile-optimized calendar list view
+function MobileCalendarView({ events, currentDate, onNavigate }: { events: EventData[]; currentDate: Date; onNavigate: (date: Date) => void }) {
+  const month = moment(currentDate);
+  const startOfMonth = month.clone().startOf('month');
+  const endOfMonth = month.clone().endOf('month');
+
+  // Filter events for current month
+  const monthEvents = events
+    .filter(e => moment(e.start).isBetween(startOfMonth, endOfMonth, undefined, '[]'))
+    .sort((a, b) => a.start.getTime() - b.start.getTime());
+
+  // Group events by date
+  const groupedEvents: Record<string, EventData[]> = {};
+  monthEvents.forEach(event => {
+    const dateKey = moment(event.start).format('YYYY-MM-DD');
+    if (!groupedEvents[dateKey]) groupedEvents[dateKey] = [];
+    groupedEvents[dateKey].push(event);
+  });
+
+  const CALENDAR_COLORS: Record<string, { bg: string; border: string; text: string }> = {
+    technology: { bg: 'bg-blue-100 dark:bg-blue-900/30', border: 'border-blue-500', text: 'text-blue-700 dark:text-blue-300' },
+    cultural: { bg: 'bg-purple-100 dark:bg-purple-900/30', border: 'border-purple-500', text: 'text-purple-700 dark:text-purple-300' },
+    workshop: { bg: 'bg-amber-100 dark:bg-amber-900/30', border: 'border-amber-500', text: 'text-amber-700 dark:text-amber-300' },
+    sports: { bg: 'bg-green-100 dark:bg-green-900/30', border: 'border-green-500', text: 'text-green-700 dark:text-green-300' },
+    seminar: { bg: 'bg-rose-100 dark:bg-rose-900/30', border: 'border-rose-500', text: 'text-rose-700 dark:text-rose-300' },
+    social: { bg: 'bg-pink-100 dark:bg-pink-900/30', border: 'border-pink-500', text: 'text-pink-700 dark:text-pink-300' },
+    general: { bg: 'bg-gray-100 dark:bg-gray-800/50', border: 'border-gray-500', text: 'text-gray-700 dark:text-gray-300' },
+  };
+
+  // Generate mini calendar grid
+  const daysInMonth = month.daysInMonth();
+  const firstDayOfWeek = startOfMonth.day();
+  const today = moment();
+
+  return (
+    <div className="space-y-6">
+      {/* Month Navigation */}
+      <div className="flex items-center justify-between">
+        <button
+          onClick={() => onNavigate(month.clone().subtract(1, 'month').toDate())}
+          className="p-2 rounded-lg hover:bg-muted/80 transition-colors border border-border/50"
+        >
+          <ChevronLeft className="w-5 h-5" />
+        </button>
+        <h2 className="text-xl font-bold tracking-tight">{month.format('MMMM YYYY')}</h2>
+        <button
+          onClick={() => onNavigate(month.clone().add(1, 'month').toDate())}
+          className="p-2 rounded-lg hover:bg-muted/80 transition-colors border border-border/50"
+        >
+          <ChevronRight className="w-5 h-5" />
+        </button>
+      </div>
+
+      {/* Mini Calendar Grid */}
+      <div className="bg-card rounded-xl border border-border/50 p-4">
+        {/* Day headers */}
+        <div className="grid grid-cols-7 gap-1 mb-2">
+          {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, i) => (
+            <div key={i} className="text-center text-xs font-semibold text-muted-foreground py-1">
+              {day}
+            </div>
+          ))}
+        </div>
+        {/* Day cells */}
+        <div className="grid grid-cols-7 gap-1">
+          {/* Empty cells for days before the 1st */}
+          {Array.from({ length: firstDayOfWeek }).map((_, i) => (
+            <div key={`empty-${i}`} className="aspect-square" />
+          ))}
+          {/* Day numbers */}
+          {Array.from({ length: daysInMonth }).map((_, i) => {
+            const day = i + 1;
+            const dateKey = month.clone().date(day).format('YYYY-MM-DD');
+            const hasEvents = !!groupedEvents[dateKey];
+            const isToday = today.isSame(month.clone().date(day), 'day');
+
+            return (
+              <div
+                key={day}
+                className={`aspect-square flex flex-col items-center justify-center rounded-lg text-sm relative transition-colors ${
+                  isToday
+                    ? 'bg-primary text-primary-foreground font-bold'
+                    : hasEvents
+                    ? 'bg-primary/10 font-medium'
+                    : ''
+                }`}
+              >
+                {day}
+                {hasEvents && !isToday && (
+                  <div className="absolute bottom-0.5 flex gap-0.5">
+                    {groupedEvents[dateKey].slice(0, 3).map((ev, idx) => {
+                      const col = CALENDAR_COLORS[ev.category] || CALENDAR_COLORS.general;
+                      return <div key={idx} className={`w-1 h-1 rounded-full ${col.border.replace('border-', 'bg-')}`} />;
+                    })}
+                  </div>
+                )}
+                {hasEvents && isToday && (
+                  <div className="absolute bottom-0.5 flex gap-0.5">
+                    {groupedEvents[dateKey].slice(0, 3).map((_, idx) => (
+                      <div key={idx} className="w-1 h-1 rounded-full bg-primary-foreground" />
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Events List */}
+      <div className="space-y-4">
+        {Object.keys(groupedEvents).length === 0 ? (
+          <div className="text-center py-12 px-4">
+            <CalendarDays className="w-12 h-12 text-muted-foreground/50 mx-auto mb-3" />
+            <p className="text-muted-foreground font-medium">No events this month</p>
+            <p className="text-sm text-muted-foreground/70 mt-1">Try navigating to a different month</p>
+          </div>
+        ) : (
+          Object.entries(groupedEvents).map(([dateKey, dayEvents]) => (
+            <div key={dateKey}>
+              <div className="flex items-center gap-2 mb-2">
+                <div className="text-sm font-semibold text-primary">
+                  {moment(dateKey).format('ddd, MMM D')}
+                </div>
+                {moment(dateKey).isSame(today, 'day') && (
+                  <span className="text-[10px] font-bold uppercase bg-primary text-primary-foreground px-2 py-0.5 rounded-full">
+                    Today
+                  </span>
+                )}
+                <div className="flex-1 h-px bg-border/50" />
+              </div>
+              <div className="space-y-2">
+                {dayEvents.map(event => {
+                  const color = CALENDAR_COLORS[event.category] || CALENDAR_COLORS.general;
+                  return (
+                    <Link
+                      key={event.id}
+                      href={`/events/${event.id}`}
+                      className={`block p-3 rounded-xl border-l-4 ${color.border} ${color.bg} active:scale-[0.98] transition-all`}
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          <h4 className={`font-semibold text-sm truncate ${color.text}`}>
+                            {event.title}
+                          </h4>
+                          <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
+                            <Clock className="w-3 h-3 shrink-0" />
+                            <span>{moment(event.start).format('h:mm A')}</span>
+                            <span className="text-muted-foreground/50">•</span>
+                            <span className="truncate">{event.venue}</span>
+                          </div>
+                        </div>
+                        <span className={`text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full ${color.bg} ${color.text} border border-current/20`}>
+                          {event.category}
+                        </span>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function CalendarPage() {
   const [events, setEvents] = useState<EventData[]>([]);
   const [view, setView] = useState<View>('month');
@@ -29,9 +199,15 @@ export default function CalendarPage() {
   const router = useRouter();
   const { resolvedTheme } = useTheme();
   const [isMounted, setIsMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
+    const mql = window.matchMedia('(max-width: 768px)');
+    setIsMobile(mql.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mql.addEventListener('change', handler);
+    return () => mql.removeEventListener('change', handler);
   }, []);
 
   useEffect(() => {
@@ -351,24 +527,6 @@ export default function CalendarPage() {
           border-top: 1px solid hsl(var(--border));
           min-height: 100px;
         }
-        
-        /* Responsive improvements */
-        @media (max-width: 768px) {
-          .rbc-toolbar {
-            flex-direction: column;
-            gap: 8px;
-          }
-          
-          .rbc-toolbar-label {
-            order: -1;
-            text-align: center;
-          }
-          
-          .rbc-event {
-            font-size: 11px;
-            padding: 2px 4px;
-          }
-        }
 
         /* Light Mode Gradient Border */
         .calendar-card-light::before {
@@ -410,57 +568,102 @@ export default function CalendarPage() {
         </div>
       </div>
 
-      <div
-        className={`relative border rounded-lg p-6 bg-card z-0 transition-all duration-300 overflow-x-auto ${!isDark ? 'calendar-card-light' : ''}`}
-        style={{ minHeight: '750px' }}
-      >
-        {isMounted && isDark && (
-          <div className="absolute inset-0 -z-10 pointer-events-none rounded-lg">
-            <PulsingBorder
-              colors={['#6366f1']}
-              colorBack="#ffffff00"
-              intensity={0.15}
-              bloom={0.2}
-              pulse={0.1}
-              speed={0.9}
-              scale={1}
-              fit="cover"
-              thickness={0.02}
-              style={{
-                width: '100%',
-                height: '100%',
-                display: 'block'
+      {/* Mobile Calendar View */}
+      {isMounted && isMobile && (
+        <div
+          className={`relative border rounded-xl p-4 bg-card z-0 transition-all duration-300 ${!isDark ? 'calendar-card-light' : ''}`}
+        >
+          {isDark && (
+            <div className="absolute inset-0 -z-10 pointer-events-none rounded-xl overflow-hidden">
+              <PulsingBorder
+                colors={['#6366f1']}
+                colorBack="#ffffff00"
+                intensity={0.15}
+                bloom={0.2}
+                pulse={0.1}
+                speed={0.9}
+                scale={1}
+                fit="cover"
+                thickness={0.02}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  display: 'block'
+                }}
+              />
+            </div>
+          )}
+          <MobileCalendarView
+            events={events}
+            currentDate={date}
+            onNavigate={setDate}
+          />
+        </div>
+      )}
+
+      {/* Desktop Calendar View */}
+      {isMounted && !isMobile && (
+        <div
+          className={`relative border rounded-lg p-6 bg-card z-0 transition-all duration-300 overflow-x-auto ${!isDark ? 'calendar-card-light' : ''}`}
+          style={{ minHeight: '750px' }}
+        >
+          {isDark && (
+            <div className="absolute inset-0 -z-10 pointer-events-none rounded-lg">
+              <PulsingBorder
+                colors={['#6366f1']}
+                colorBack="#ffffff00"
+                intensity={0.15}
+                bloom={0.2}
+                pulse={0.1}
+                speed={0.9}
+                scale={1}
+                fit="cover"
+                thickness={0.02}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  display: 'block'
+                }}
+              />
+            </div>
+          )}
+          <div className="min-w-[700px]">
+            <Calendar
+              localizer={localizer}
+              events={events}
+              startAccessor="start"
+              endAccessor="end"
+              style={{ height: 700 }}
+              onSelectEvent={handleSelectEvent}
+              view={view}
+              onView={setView}
+              date={date}
+              onNavigate={setDate}
+              views={['month', 'week', 'day', 'agenda']}
+              defaultView="month"
+              step={30}
+              timeslots={2}
+              min={new Date(2024, 0, 1, 7, 0, 0)}
+              max={new Date(2024, 0, 1, 22, 0, 0)}
+              showMultiDayTimes
+              popup
+              eventPropGetter={eventStyleGetter}
+              components={{
+                event: EventComponent
               }}
             />
           </div>
-        )}
-        <div className="min-w-[700px]">
-          <Calendar
-            localizer={localizer}
-            events={events}
-            startAccessor="start"
-            endAccessor="end"
-            style={{ height: 700 }}
-            onSelectEvent={handleSelectEvent}
-            view={view}
-            onView={setView}
-            date={date}
-            onNavigate={setDate}
-            views={['month', 'week', 'day', 'agenda']}
-            defaultView="month"
-            step={30}
-            timeslots={2}
-            min={new Date(2024, 0, 1, 7, 0, 0)}
-            max={new Date(2024, 0, 1, 22, 0, 0)}
-            showMultiDayTimes
-            popup
-            eventPropGetter={eventStyleGetter}
-            components={{
-              event: EventComponent
-            }}
-          />
         </div>
-      </div>
+      )}
+
+      {/* Loading placeholder before mount */}
+      {!isMounted && (
+        <div className="border rounded-lg p-6 bg-card" style={{ minHeight: '400px' }}>
+          <div className="flex items-center justify-center h-full">
+            <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
